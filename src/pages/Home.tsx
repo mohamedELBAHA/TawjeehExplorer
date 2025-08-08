@@ -31,8 +31,8 @@ const LandingPage = () => {
   const [loadingPercent, setLoadingPercent] = useState(0);
 
   const stats = [
-    { number: "150+", label: "Établissements", icon: School },
-    { number: "500K+", label: "Étudiants", icon: Users },
+    { number: "90+", label: "Établissements", icon: School },
+    { number: "100+", label: "Étudiants", icon: Users },
     { number: "12", label: "Villes", icon: MapPin },
     { number: "98%", label: "Satisfaction", icon: Star }
   ];
@@ -117,8 +117,8 @@ const LandingPage = () => {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
               <div className="flex-shrink-0 flex flex-col items-start">
-                <span className="text-xl font-bold bg-gradient-to-r from-[#004235] to-[#cda86b] bg-clip-text text-transparent">
-                  Tawjeeh Explorer
+                <span className="text-2xl font-bold text-[#004235]">
+                  Tawjeeh Navigator
                 </span>
                 <span className="mt-1 text-xs italic text-gray-500">powered by Tawjeeh</span>
               </div>
@@ -212,7 +212,7 @@ const LandingPage = () => {
                     </span>
                   </h1>
                   <p className="text-xl text-gray-600 leading-relaxed max-w-lg">
-                    Découvrez et comparez plus de 150 établissements d'enseignement supérieur avec notre plateforme interactive et intelligente.
+                    Découvrez et comparez plus de 90 établissements d'enseignement supérieur avec notre plateforme interactive et intelligente.
                   </p>
                 </div>
 

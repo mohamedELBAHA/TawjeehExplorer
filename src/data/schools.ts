@@ -6,23 +6,27 @@ export interface School {
   coordinates: [number, number];
   students: number;
   phone: string;
-    email: string;
-    website: string;
-    founded: number;
-    specialties: string[];
-    filiere: string;
-    bacTypes: string[];
-    seuilEntree: number | 'NA';
-    description: string;
-    programs: string[];
-    facilities: string[];
-    image: string;
-    successRate: number | 'NA';
-    employmentRate: number | 'NA';
-    averageSalary: number | 'NA';
-    partnerships: string[];
-    researchAreas: string[];
-  }
+  email: string;
+  website: string;
+  founded: number;
+  specialties: string[];
+  filiere: string;
+  bacTypes: string[];
+  seuilEntree: number | 'NA';
+  description: string;
+  programs: string[];
+  facilities: string[];
+  image: string;
+  successRate: number | 'NA';
+  employmentRate: number | 'NA';
+  averageSalary: number | 'NA';
+  partnerships: string[];
+  researchAreas: string[];
+  // New advanced filter fields
+  isPublic: boolean;
+  requiresConcours: boolean;
+  admissionType: 'Concours' | 'Preselection' | 'Combined' | 'Direct';
+}
 
   export const schoolsData: School[] = [
     {
@@ -48,7 +52,10 @@ export interface School {
       employmentRate: 95,
       averageSalary: 45000,
       partnerships: ["Microsoft", "IBM", "Oracle"],
-      researchAreas: ["Machine Learning", "Blockchain", "IoT"]
+      researchAreas: ["Machine Learning", "Blockchain", "IoT"],
+      isPublic: true,
+      requiresConcours: true,
+      admissionType: 'Concours' as const
     },
     {
       id: 2,
@@ -73,7 +80,10 @@ export interface School {
       employmentRate: 91,
       averageSalary: 38000,
       partnerships: ["CHU Hassan II", "Institut Pasteur", "OMS"],
-      researchAreas: ["Médecine", "Biotechnologie", "Santé publique"]
+      researchAreas: ["Médecine", "Biotechnologie", "Santé publique"],
+      isPublic: true,
+      requiresConcours: false,
+      admissionType: 'Preselection' as const
     },
     {
       id: 3,
@@ -98,7 +108,10 @@ export interface School {
       employmentRate: 97,
       averageSalary: 48000,
       partnerships: ["Bouygues", "Siemens", "Total"],
-      researchAreas: ["BTP", "Énergies renouvelables", "Smart Cities"]
+      researchAreas: ["BTP", "Énergies renouvelables", "Smart Cities"],
+      isPublic: true,
+      requiresConcours: true,
+      admissionType: 'Concours' as const
     },
     {
       id: 4,
@@ -123,7 +136,10 @@ export interface School {
       employmentRate: 87,
       averageSalary: 32000,
       partnerships: ["Université de Bordeaux", "CNRS", "UNESCO"],
-      researchAreas: ["Tourisme", "Patrimoine", "Développement durable"]
+      researchAreas: ["Tourisme", "Patrimoine", "Développement durable"],
+      isPublic: true,
+      requiresConcours: false,
+      admissionType: 'Direct' as const
     },
     {
       id: 5,
@@ -149,6 +165,10 @@ export interface School {
       averageSalary: 36000,
       partnerships: ["CHU de Fès", "Institut Pasteur", "Université de Montpellier"],
       researchAreas: ["Médecine traditionnelle", "Pharmacologie", "Génétique"]
+    ,
+      isPublic: true,
+      requiresConcours: true,
+      admissionType: 'Concours' as const
     },
     {
       id: 6,
@@ -174,6 +194,10 @@ export interface School {
       averageSalary: 28000,
       partnerships: ["OCP", "Souss Massa", "Technopole"],
       researchAreas: ["Agrotech", "Énergies solaires", "Industrie 4.0"]
+    ,
+      isPublic: true,
+      requiresConcours: false,
+      admissionType: 'Preselection' as const
     },
     {
       id: 7,
@@ -199,6 +223,10 @@ export interface School {
       averageSalary: 36000,
       partnerships: ["CHU Fès", "Institut Pasteur"],
       researchAreas: ["Pharmacologie", "Génétique"]
+    ,
+      isPublic: false,
+      requiresConcours: true,
+      admissionType: 'Concours' as const
     },
     // ENSA schools
     {
@@ -225,6 +253,10 @@ export interface School {
       averageSalary: 'NA',
       partnerships: [],
       researchAreas: []
+    ,
+      isPublic: true,
+      requiresConcours: true,
+      admissionType: 'Concours' as const
     },
     {
       id: 202,
@@ -250,6 +282,10 @@ export interface School {
       averageSalary: 'NA',
       partnerships: [],
       researchAreas: []
+    ,
+      isPublic: false,
+      requiresConcours: true,
+      admissionType: 'Concours' as const
     },
     {
       id: 203,
@@ -275,6 +311,10 @@ export interface School {
       averageSalary: 'NA',
       partnerships: [],
       researchAreas: []
+    ,
+      isPublic: false,
+      requiresConcours: true,
+      admissionType: 'Concours' as const
     },
     {
       id: 8,
@@ -300,6 +340,10 @@ export interface School {
       averageSalary: 'NA',
       partnerships: [],
       researchAreas: []
+    ,
+      isPublic: true,
+      requiresConcours: true,
+      admissionType: 'Combined' as const
     },
     {
       id: 9,
@@ -325,6 +369,10 @@ export interface School {
       averageSalary: 'NA',
       partnerships: [],
       researchAreas: []
+    ,
+      isPublic: true,
+      requiresConcours: true,
+      admissionType: 'Combined' as const
     },
     {
       id: 10,
@@ -350,6 +398,10 @@ export interface School {
       averageSalary: 'NA',
       partnerships: [],
       researchAreas: []
+    ,
+      isPublic: true,
+      requiresConcours: false,
+      admissionType: 'Preselection' as const
     },
     {
       id: 11,
@@ -375,6 +427,10 @@ export interface School {
       averageSalary: 'NA',
       partnerships: [],
       researchAreas: []
+    ,
+      isPublic: true,
+      requiresConcours: false,
+      admissionType: 'Preselection' as const
     },
     {
       id: 12,
@@ -400,6 +456,10 @@ export interface School {
       averageSalary: 'NA',
       partnerships: [],
       researchAreas: []
+    ,
+      isPublic: false,
+      requiresConcours: false,
+      admissionType: 'Direct' as const
     },
     {
       id: 13,
@@ -425,6 +485,10 @@ export interface School {
       averageSalary: 'NA',
       partnerships: [],
       researchAreas: []
+    ,
+      isPublic: false,
+      requiresConcours: true,
+      admissionType: 'Concours' as const
     },
     {
       id: 210,
@@ -450,6 +514,10 @@ export interface School {
       averageSalary: 'NA',
       partnerships: [],
       researchAreas: []
+    ,
+      isPublic: true,
+      requiresConcours: false,
+      admissionType: 'Preselection' as const
     },
     {
       id: 14,
@@ -475,6 +543,10 @@ export interface School {
       averageSalary: 'NA',
       partnerships: [],
       researchAreas: []
+    ,
+      isPublic: true,
+      requiresConcours: false,
+      admissionType: 'Preselection' as const
     },
     {
       id: 15,
@@ -506,6 +578,10 @@ export interface School {
       averageSalary: 'NA',
       partnerships: ["INSA France"],
       researchAreas: []
+    ,
+      isPublic: false,
+      requiresConcours: true,
+      admissionType: 'Concours' as const
     },
     {
       id: 16,
@@ -538,5 +614,9 @@ export interface School {
       averageSalary: 'NA',
       partnerships: [],
       researchAreas: []
+    ,
+      isPublic: true,
+      requiresConcours: true,
+      admissionType: 'Combined' as const
     }
   ];
