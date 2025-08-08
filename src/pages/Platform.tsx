@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { schoolsData, School } from '../data/schools';
 import { MapContainer, TileLayer, Marker, Popup, GeoJSON } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -60,16 +60,31 @@ const Platform: React.FC = () => {
   const [highlightedSchoolId, setHighlightedSchoolId] = useState<number | null>(null);
   
   // Advanced filters state
-  const [showAdvancedFilters, setShowAdvancedFilters] = useState<boolean>(false);
   const [selectedPublicPrivate, setSelectedPublicPrivate] = useState<string>('');
   const [selectedConcoursType, setSelectedConcoursType] = useState<string>('');
   const [selectedAdmissionType, setSelectedAdmissionType] = useState<string>('');
+  const [selectedSpecialty, setSelectedSpecialty] = useState<string>('');
 
   // Get unique values for filters
   const uniqueFilieres = Array.from(new Set(schoolsData.map(school => school.filiere)));
   const uniqueCities = Array.from(new Set(schoolsData.map(school => school.city)));
   const uniqueBacTypes = Array.from(new Set(schoolsData.flatMap(school => school.bacTypes)));
   const uniqueInstitutionTypes = Array.from(new Set(schoolsData.map(school => school.type)));
+
+  // Get unique specialties for Engineering schools when "Ingénierie" is selected
+  const availableSpecialties = useMemo(() => {
+    if (selectedFiliere === 'Ingénierie') {
+      const engineeringSchools = schoolsData.filter(school => school.filiere === 'Ingénierie');
+      const allSpecialties = engineeringSchools.flatMap(school => school.specialties);
+      return Array.from(new Set(allSpecialties)).sort();
+    }
+    return [];
+  }, [selectedFiliere]);
+
+  // Reset specialty filter when filière changes
+  useEffect(() => {
+    setSelectedSpecialty('');
+  }, [selectedFiliere]);
 
   // Filter schools based on selected criteria
   const filteredSchools = useMemo(() => {
@@ -90,12 +105,15 @@ const Platform: React.FC = () => {
         (selectedConcoursType === 'without-concours' && !school.requiresConcours);
         
       const admissionTypeMatch = !selectedAdmissionType || school.admissionType === selectedAdmissionType;
+      
+      // Specialty filter (only for Engineering schools)
+      const specialtyMatch = !selectedSpecialty || school.specialties.includes(selectedSpecialty);
 
       return filiereMatch && cityMatch && bacTypeMatch && institutionTypeMatch && seuilMatch && 
-             publicPrivateMatch && concoursMatch && admissionTypeMatch;
+             publicPrivateMatch && concoursMatch && admissionTypeMatch && specialtyMatch;
     });
   }, [selectedFiliere, selectedCity, selectedBacType, selectedInstitutionType, seuilValue, 
-      selectedPublicPrivate, selectedConcoursType, selectedAdmissionType]);
+      selectedPublicPrivate, selectedConcoursType, selectedAdmissionType, selectedSpecialty]);
 
   const toggleSchoolExpansion = (schoolId: number) => {
     const newExpandedSchools = new Set(expandedSchools);
@@ -137,6 +155,7 @@ const Platform: React.FC = () => {
     setSelectedPublicPrivate('');
     setSelectedConcoursType('');
     setSelectedAdmissionType('');
+    setSelectedSpecialty('');
     setHighlightedSchoolId(null);
   };
 
@@ -161,14 +180,20 @@ const Platform: React.FC = () => {
       <div className="bg-gray-100 border-b border-gray-300 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="space-y-4">
-            {/* Basic Filters Row */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            {/* First Row - Basic Filters */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
               {/* Filiere Filter */}
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1">Filière</label>
                 <select 
                   value={selectedFiliere} 
-                  onChange={(e) => setSelectedFiliere(e.target.value)}
+                  onChange={(e) => {
+                    setSelectedFiliere(e.target.value);
+                    // Reset specialty when filière changes
+                    if (e.target.value !== 'Ingénierie') {
+                      setSelectedSpecialty('');
+                    }
+                  }}
                   className="w-full p-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-[#004235] focus:border-[#004235]"
                 >
                   <option value="">Toutes les filières</option>
@@ -227,101 +252,106 @@ const Platform: React.FC = () => {
 
               {/* Seuil Filter */}
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">
-                  Seuil: <span className="font-bold">{seuilValue}/20</span>
-                </label>
-                <input
-                  type="range"
-                  min={SEUIL_MIN}
-                  max={SEUIL_MAX}
-                  step={SEUIL_STEP}
-                  value={seuilValue}
-                  onChange={e => setSeuilValue(Number(e.target.value))}
-                  className="w-full h-2 rounded-full appearance-none bg-gray-200"
-                  style={{ accentColor: '#004235' }}
-                />
+                <label className="block text-xs font-medium text-gray-700 mb-2">Seuil</label>
+                <div className="flex items-center justify-center bg-white border border-gray-300 rounded-md p-2">
+                  <button
+                    onClick={() => setSeuilValue(Math.max(SEUIL_MIN, seuilValue - SEUIL_STEP))}
+                    disabled={seuilValue <= SEUIL_MIN}
+                    className="w-7 h-7 flex items-center justify-center bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:text-gray-300 rounded-full transition-colors text-gray-600 font-bold text-sm"
+                  >
+                    −
+                  </button>
+                  <div className="mx-3 min-w-[3rem] text-center">
+                    <span className="text-sm font-bold text-[#004235]">{seuilValue}</span>
+                    <span className="text-xs text-gray-500">/20</span>
+                  </div>
+                  <button
+                    onClick={() => setSeuilValue(Math.min(SEUIL_MAX, seuilValue + SEUIL_STEP))}
+                    disabled={seuilValue >= SEUIL_MAX}
+                    className="w-7 h-7 flex items-center justify-center bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:text-gray-300 rounded-full transition-colors text-gray-600 font-bold text-sm"
+                  >
+                    +
+                  </button>
+                </div>
               </div>
             </div>
 
-            {/* Advanced Filters and Actions Row */}
+            {/* Second Row - Advanced Filters */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+              {/* Public/Private Filter */}
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">Secteur</label>
+                <select 
+                  value={selectedPublicPrivate} 
+                  onChange={(e) => setSelectedPublicPrivate(e.target.value)}
+                  className="w-full p-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-[#004235] focus:border-[#004235]"
+                >
+                  <option value="">Public et Privé</option>
+                  <option value="public">🏛️ Public uniquement</option>
+                  <option value="private">🏢 Privé uniquement</option>
+                </select>
+              </div>
+
+              {/* Concours Requirement Filter */}
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">Mode d'admission</label>
+                <select 
+                  value={selectedConcoursType} 
+                  onChange={(e) => setSelectedConcoursType(e.target.value)}
+                  className="w-full p-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-[#004235] focus:border-[#004235]"
+                >
+                  <option value="">Tous les modes</option>
+                  <option value="with-concours">📝 Avec concours</option>
+                  <option value="without-concours">✅ Sans concours</option>
+                </select>
+              </div>
+
+              {/* Admission Type Filter */}
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">Type d'admission</label>
+                <select 
+                  value={selectedAdmissionType} 
+                  onChange={(e) => setSelectedAdmissionType(e.target.value)}
+                  className="w-full p-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-[#004235] focus:border-[#004235]"
+                >
+                  <option value="">Tous les types</option>
+                  <option value="Concours">🏆 Concours</option>
+                  <option value="Preselection">📋 Présélection</option>
+                  <option value="Combined">🔄 Mixte</option>
+                  <option value="Direct">⚡ Accès direct</option>
+                </select>
+              </div>
+
+              {/* Specialty Filter - Only shown when Ingénierie is selected */}
+              {selectedFiliere === 'Ingénierie' && (
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">Spécialité</label>
+                  <select 
+                    value={selectedSpecialty} 
+                    onChange={(e) => setSelectedSpecialty(e.target.value)}
+                    className="w-full p-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-[#004235] focus:border-[#004235]"
+                  >
+                    <option value="">Toutes les spécialités</option>
+                    {availableSpecialties.map(specialty => (
+                      <option key={specialty} value={specialty}>{specialty}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+            </div>
+
+            {/* Results and Actions Row */}
             <div className="flex flex-wrap items-center justify-between gap-4">
-              {/* Advanced Filters Toggle */}
+              <span className="text-sm text-gray-600">
+                {filteredSchools.length} écoles trouvées
+              </span>
               <button
-                onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-                className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white rounded-md hover:bg-gray-50 transition-colors border border-gray-300"
+                onClick={clearAllFilters}
+                className="px-3 py-2 text-sm bg-white text-gray-700 rounded-md hover:bg-gray-50 transition-colors border border-gray-300"
               >
-                <span>🔧 Filtres Avancés</span>
-                <svg
-                  className={`w-4 h-4 transition-transform ${showAdvancedFilters ? 'rotate-180' : ''}`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
+                Réinitialiser tous les filtres
               </button>
-
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-600">
-                  {filteredSchools.length} écoles trouvées
-                </span>
-                <button
-                  onClick={clearAllFilters}
-                  className="px-3 py-2 text-sm bg-white text-gray-700 rounded-md hover:bg-gray-50 transition-colors border border-gray-300"
-                >
-                  Réinitialiser
-                </button>
-              </div>
             </div>
-
-            {/* Advanced Filters Content */}
-            {showAdvancedFilters && (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-gray-50 rounded-lg border">
-                {/* Public/Private Filter */}
-                <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">Secteur</label>
-                  <select 
-                    value={selectedPublicPrivate} 
-                    onChange={(e) => setSelectedPublicPrivate(e.target.value)}
-                    className="w-full p-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-[#004235] focus:border-[#004235]"
-                  >
-                    <option value="">Public et Privé</option>
-                    <option value="public">🏛️ Public uniquement</option>
-                    <option value="private">🏢 Privé uniquement</option>
-                  </select>
-                </div>
-
-                {/* Concours Requirement Filter */}
-                <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">Mode d'admission</label>
-                  <select 
-                    value={selectedConcoursType} 
-                    onChange={(e) => setSelectedConcoursType(e.target.value)}
-                    className="w-full p-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-[#004235] focus:border-[#004235]"
-                  >
-                    <option value="">Tous les modes</option>
-                    <option value="with-concours">📝 Avec concours</option>
-                    <option value="without-concours">✅ Sans concours</option>
-                  </select>
-                </div>
-
-                {/* Admission Type Filter */}
-                <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">Type d'admission</label>
-                  <select 
-                    value={selectedAdmissionType} 
-                    onChange={(e) => setSelectedAdmissionType(e.target.value)}
-                    className="w-full p-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-[#004235] focus:border-[#004235]"
-                  >
-                    <option value="">Tous les types</option>
-                    <option value="Concours">🏆 Concours</option>
-                    <option value="Preselection">📋 Présélection</option>
-                    <option value="Combined">🔄 Mixte</option>
-                    <option value="Direct">⚡ Accès direct</option>
-                  </select>
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </div>
