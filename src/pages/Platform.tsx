@@ -58,6 +58,7 @@ const Platform: React.FC = () => {
   const [seuilValue, setSeuilValue] = useState(SEUIL_MIN);
   const [expandedSchools, setExpandedSchools] = useState<Set<number>>(new Set());
   const [highlightedSchoolId, setHighlightedSchoolId] = useState<number | null>(null);
+  const [showMatcherNotification, setShowMatcherNotification] = useState(true);
   
   // Advanced filters state
   const [selectedPublicPrivate, setSelectedPublicPrivate] = useState<string>('');
@@ -176,6 +177,52 @@ const Platform: React.FC = () => {
         </div>
       </header>
 
+      {/* Matcher Suggestion Banner */}
+      {showMatcherNotification && (
+        <div className="bg-gradient-to-r from-[#004235] to-[#cda86b] text-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div className="flex-shrink-0">
+                  <svg className="w-6 h-6 text-white animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10" strokeWidth={2}/>
+                    <circle cx="12" cy="12" r="6" strokeWidth={2}/>
+                    <circle cx="12" cy="12" r="2" strokeWidth={2}/>
+                  </svg>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium">
+                    🎯 <span className="font-bold">Astuce :</span> Pas envie de filtrer manuellement ? 
+                    <span className="ml-1 underline cursor-pointer hover:text-yellow-200 transition-colors"
+                          onClick={() => {
+                            // Click the floating matcher button
+                            const matcherButton = document.querySelector('[aria-label="Ouvrir l\'assistant d\'orientation"]') as HTMLButtonElement;
+                            if (matcherButton) {
+                              matcherButton.click();
+                            }
+                          }}>
+                      Utilisez notre assistant intelligent
+                    </span> 
+                    <span className="ml-1">pour trouver vos écoles idéales en quelques questions !</span>
+                  </p>
+                </div>
+              </div>
+              <div className="flex-shrink-0">
+                <button
+                  onClick={() => setShowMatcherNotification(false)}
+                  className="text-white hover:text-gray-200 transition-colors"
+                  aria-label="Fermer la notification"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Horizontal Filter Bar */}
       <div className="bg-gray-100 border-b border-gray-300 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
@@ -252,8 +299,8 @@ const Platform: React.FC = () => {
 
               {/* Seuil Filter */}
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-2">Seuil</label>
-                <div className="flex items-center justify-center bg-white border border-gray-300 rounded-md p-2">
+                <label className="block text-xs font-medium text-gray-700 mb-1">Seuil</label>
+                <div className="flex items-center justify-center bg-white border border-gray-300 rounded-md p-2 w-fit">
                   <button
                     onClick={() => setSeuilValue(Math.max(SEUIL_MIN, seuilValue - SEUIL_STEP))}
                     disabled={seuilValue <= SEUIL_MIN}

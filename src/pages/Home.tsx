@@ -338,22 +338,22 @@ const LandingPage = () => {
                       <div className="flex items-center p-3 bg-blue-50 rounded-lg">
                         <School className="w-5 h-5 text-blue-700 mr-3" />
                         <div className="flex-1">
-                          <div className="font-medium text-gray-800 text-sm">École Mohammadia d'Ingénieurs</div>
-                          <div className="text-xs text-gray-500">Rabat • Ingénierie</div>
+                          <div className="font-medium text-gray-800 text-sm">ENCG Settat</div>
+                          <div className="text-xs text-gray-500">Settat • Commerce et Gestion</div>
                         </div>
                         <div className="text-right">
-                          <div className="text-sm font-bold text-blue-600">16.5/20</div>
+                          <div className="text-sm font-bold text-blue-600">14.5/20</div>
                           <div className="text-xs text-gray-400">Seuil</div>
                         </div>
                       </div>
                       <div className="flex items-center p-3 bg-gray-50 rounded-lg">
                         <School className="w-5 h-5 text-gray-500 mr-3" />
                         <div className="flex-1">
-                          <div className="font-medium text-gray-600 text-sm">Université Mohammed V</div>
+                          <div className="font-medium text-gray-600 text-sm">Faculté de Medecine, Université Mohammed V</div>
                           <div className="text-xs text-gray-400">Casablanca • Médecine</div>
                         </div>
                         <div className="text-right">
-                          <div className="text-sm font-bold text-gray-600">18.0/20</div>
+                          <div className="text-sm font-bold text-gray-600">16.0/20</div>
                           <div className="text-xs text-gray-400">Seuil</div>
                         </div>
                       </div>
@@ -536,7 +536,7 @@ const LandingPage = () => {
             Prêt à découvrir votre future école ?
           </h2>
           <p className="text-xl text-[#cda86b] mb-8">
-            Rejoignez des milliers d'étudiants qui ont déjà trouvé leur voie avec Afaqi
+            Rejoignez des milliers d'étudiants qui ont déjà trouvé leur voie avec Tawjeeh
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button 
