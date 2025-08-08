@@ -22,6 +22,44 @@ import {
 } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
+
+// Fix for default markers not showing in production
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
+
+// Custom Morocco marker icon
+const createMoroccoIcon = () => {
+  return L.divIcon({
+    html: `
+      <div style="
+        background-color: #004235;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        border: 2px solid #cda86b;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      ">
+        <div style="
+          color: white;
+          font-size: 10px;
+          font-weight: bold;
+        ">🎓</div>
+      </div>
+    `,
+    className: 'custom-marker',
+    iconSize: [20, 20],
+    iconAnchor: [10, 20],
+    popupAnchor: [0, -20]
+  });
+};
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -289,7 +327,7 @@ const LandingPage = () => {
                         <TileLayer
                           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                         />
-                        <Marker position={[34.0209, -6.8416]}>
+                        <Marker position={[34.0209, -6.8416]} icon={createMoroccoIcon()}>
                           <Popup>Rabat</Popup>
                         </Marker>
                       </MapContainer>

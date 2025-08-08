@@ -4,7 +4,47 @@ import { MapContainer, TileLayer, Marker, Popup, GeoJSON } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Range } from 'react-range';
 import type { LatLngExpression } from 'leaflet';
+import L from 'leaflet';
 import ChatbotWidget from '../components/ChatbotWidget';
+
+// Fix for default markers not showing in production
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
+
+// Custom school marker icon
+const createSchoolIcon = () => {
+  return L.divIcon({
+    html: `
+      <div style="
+        background-color: #004235;
+        width: 24px;
+        height: 24px;
+        border-radius: 50% 50% 50% 0;
+        border: 2px solid #cda86b;
+        transform: rotate(-45deg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      ">
+        <div style="
+          color: white;
+          font-size: 12px;
+          font-weight: bold;
+          transform: rotate(45deg);
+        ">🎓</div>
+      </div>
+    `,
+    className: 'custom-marker',
+    iconSize: [24, 24],
+    iconAnchor: [12, 24],
+    popupAnchor: [0, -24]
+  });
+};
 
 const SEUIL_MIN = 10;
 const SEUIL_MAX = 20;
@@ -17,6 +57,7 @@ const Platform: React.FC = () => {
   const [selectedInstitutionType, setSelectedInstitutionType] = useState<string>('');
   const [seuilValue, setSeuilValue] = useState(SEUIL_MIN);
   const [expandedSchools, setExpandedSchools] = useState<Set<number>>(new Set());
+  const [highlightedSchoolId, setHighlightedSchoolId] = useState<number | null>(null);
   
   // Advanced filters state
   const [showAdvancedFilters, setShowAdvancedFilters] = useState<boolean>(false);
@@ -66,6 +107,27 @@ const Platform: React.FC = () => {
     setExpandedSchools(newExpandedSchools);
   };
 
+  const handleMarkerClick = (schoolId: number) => {
+    // Highlight the school card
+    setHighlightedSchoolId(schoolId);
+    
+    // Scroll to the school card
+    setTimeout(() => {
+      const schoolElement = document.getElementById(`school-card-${schoolId}`);
+      if (schoolElement) {
+        schoolElement.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'center' 
+        });
+      }
+    }, 100);
+
+    // Remove highlight after 3 seconds
+    setTimeout(() => {
+      setHighlightedSchoolId(null);
+    }, 3000);
+  };
+
   const clearAllFilters = () => {
     setSelectedFiliere('');
     setSelectedCity('');
@@ -75,6 +137,7 @@ const Platform: React.FC = () => {
     setSelectedPublicPrivate('');
     setSelectedConcoursType('');
     setSelectedAdmissionType('');
+    setHighlightedSchoolId(null);
   };
 
   return (
@@ -281,11 +344,24 @@ const Platform: React.FC = () => {
                   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
                 {filteredSchools.map((school) => (
-                  <Marker key={school.id} position={school.coordinates as LatLngExpression}>
+                  <Marker 
+                    key={school.id} 
+                    position={school.coordinates as LatLngExpression}
+                    icon={createSchoolIcon()}
+                    eventHandlers={{
+                      click: () => handleMarkerClick(school.id)
+                    }}
+                  >
                     <Popup>
                       <div className="font-semibold">{school.name}</div>
                       <div className="text-xs text-gray-600">{school.city}</div>
                       <div className="text-xs text-[#cda86b] font-bold mt-1">Seuil: {school.seuilEntree}/20</div>
+                      <button 
+                        onClick={() => handleMarkerClick(school.id)}
+                        className="mt-2 text-xs bg-[#004235] text-white px-2 py-1 rounded hover:bg-[#cda86b] transition-colors"
+                      >
+                        Voir la carte →
+                      </button>
                     </Popup>
                   </Marker>
                 ))}
@@ -303,12 +379,28 @@ const Platform: React.FC = () => {
             <div className="h-full overflow-y-auto p-4 space-y-4">
               {filteredSchools.map((school: School) => {
                 const isExpanded = expandedSchools.has(school.id);
+                const isHighlighted = highlightedSchoolId === school.id;
                 return (
-                  <div key={school.id} className="border border-gray-200 rounded-lg hover:shadow-md transition-shadow">
+                  <div 
+                    key={school.id} 
+                    id={`school-card-${school.id}`}
+                    className={`border rounded-lg transition-all duration-500 ${
+                      isHighlighted 
+                        ? 'border-[#cda86b] shadow-lg bg-gradient-to-r from-[#cda86b]/10 to-[#004235]/5 scale-[1.02]' 
+                        : 'border-gray-200 hover:shadow-md'
+                    }`}
+                  >
                     <div className="p-4">
                       <div className="flex justify-between items-start mb-3">
                         <div className="flex-1">
-                          <h3 className="text-lg font-semibold text-gray-900 mb-1">{school.name}</h3>
+                          <h3 className="text-lg font-semibold text-gray-900 mb-1 flex items-center">
+                            {isHighlighted && (
+                              <span className="inline-flex items-center mr-2 text-[#cda86b] animate-pulse">
+                                📍
+                              </span>
+                            )}
+                            {school.name}
+                          </h3>
                           <div className="flex flex-wrap items-center gap-2 text-sm text-gray-600">
                             <span className="px-2 py-1 rounded bg-gray-100 text-gray-700 text-xs">
                               {school.type}
