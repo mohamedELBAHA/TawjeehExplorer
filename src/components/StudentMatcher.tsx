@@ -169,6 +169,124 @@ const StudentMatcher: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     setMatchResults([]);
   };
 
+  const exportResults = () => {
+    const averageGrade = Object.values(studentProfile.grades).reduce((a, b) => a + b, 0) / 5;
+    const currentDate = new Date().toLocaleDateString('fr-FR');
+    
+    let reportContent = `RAPPORT D'ORIENTATION PERSONNALISÉ
+Tawjeeh Explorer - ${currentDate}
+
+====================================
+PROFIL ÉTUDIANT
+====================================
+
+Type de Baccalauréat: ${studentProfile.bacType}
+
+Moyennes par matière:
+• Mathématiques: ${studentProfile.grades.math}/20
+• Physique-Chimie: ${studentProfile.grades.physics}/20
+• Français: ${studentProfile.grades.french}/20
+• Philosophie: ${studentProfile.grades.philosophy}/20
+• Matière de spécialité: ${studentProfile.grades.speciality}/20
+• Moyenne générale: ${averageGrade.toFixed(2)}/20
+
+Villes préférées: ${studentProfile.preferredCities.join(', ')}
+Domaines d'intérêt: ${studentProfile.preferredFields.join(', ')}
+
+Budget familial: ${studentProfile.budgetRange.min.toLocaleString()} - ${studentProfile.budgetRange.max.toLocaleString()} MAD
+
+Préférences:
+• Secteur: ${studentProfile.constraints.publicPrivate === 'public' ? 'Public uniquement' : 
+              studentProfile.constraints.publicPrivate === 'private' ? 'Privé uniquement' : 'Public et Privé'}
+• Mode d'admission: ${studentProfile.constraints.concoursPreference === 'with' ? 'Avec concours' : 
+                     studentProfile.constraints.concoursPreference === 'without' ? 'Sans concours' : 'Les deux'}
+• Logement étudiant: ${studentProfile.constraints.needsHousing ? 'Oui' : 'Non'}
+• Bourse d'études: ${studentProfile.constraints.needsScholarship ? 'Oui' : 'Non'}
+
+====================================
+RECOMMANDATIONS (${matchResults.length} écoles)
+====================================
+
+`;
+
+    matchResults.forEach((result, index) => {
+      reportContent += `
+${index + 1}. ${result.school.name}
+   Compatibilité: ${result.score}%
+   Ville: ${result.school.city}
+   Type: ${result.school.type}
+   Filière: ${result.school.filiere}
+   Seuil d'entrée: ${result.school.seuilEntree}/20
+   
+   Description:
+   ${result.school.description}
+   
+   Raisons de correspondance:
+${result.reasons.map(reason => `   ✓ ${reason}`).join('\n')}
+   
+   Contact:
+   • Téléphone: ${result.school.phone}
+   • Email: ${result.school.email}
+   • Site web: ${result.school.website}
+   
+   Informations supplémentaires:
+   • Étudiants: ${result.school.students}
+   • Fondée en: ${result.school.founded}
+   • Taux de réussite: ${result.school.successRate}%
+   • Taux d'emploi: ${result.school.employmentRate}%
+   • Salaire moyen: ${result.school.averageSalary?.toLocaleString()} MAD
+   
+   Spécialités: ${result.school.specialties.join(', ')}
+   Programmes: ${result.school.programs.join(', ')}
+
+${'='.repeat(50)}
+`;
+    });
+
+    reportContent += `
+MÉTHODOLOGIE DE CORRESPONDANCE
+====================================
+
+Notre algorithme d'orientation personnalisé évalue votre profil selon ces critères:
+
+• Type de Baccalauréat (25%): Correspondance avec les types de bac acceptés
+• Domaine d'études (20%): Alignement avec vos filières préférées  
+• Compatibilité des notes (20%): Votre moyenne vs seuils d'admission
+• Localisation (15%): Proximité avec vos villes préférées
+• Secteur public/privé (10%): Respect de vos préférences sectorielles
+• Mode d'admission (10%): Concours vs admission directe
+
+Score minimum affiché: 30%
+
+====================================
+CONSEILS ET PROCHAINES ÉTAPES
+====================================
+
+1. Contactez directement les écoles qui vous intéressent
+2. Vérifiez les dates limites d'inscription
+3. Préparez vos dossiers de candidature
+4. Explorez les possibilités de bourses et d'aide financière
+5. Visitez les campus si possible
+
+Pour plus d'informations, consultez notre plateforme:
+https://tawjeeh-explorer.com
+
+Rapport généré automatiquement par Tawjeeh Explorer
+© 2024 - Assistant d'orientation intelligent pour étudiants marocains
+`;
+
+    // Create and download the file
+    const blob = new Blob([reportContent], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `Rapport_Orientation_${new Date().toISOString().split('T')[0]}.txt`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   const isStepValid = () => {
     switch (currentStep) {
       case 1: return studentProfile.bacType !== '';
@@ -523,13 +641,24 @@ const StudentMatcher: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                   ))}
                 </div>
 
-                <div className="text-center mt-6">
-                  <button
-                    onClick={handleRestart}
-                    className="bg-[#cda86b] text-white px-6 py-3 rounded-lg font-medium hover:bg-[#004235] transition-colors"
-                  >
-                    🔄 Recommencer l'évaluation
-                  </button>
+                <div className="text-center mt-6 space-y-3">
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                    <button
+                      onClick={exportResults}
+                      className="bg-[#004235] text-white px-6 py-3 rounded-lg font-medium hover:bg-[#cda86b] transition-colors flex items-center justify-center"
+                    >
+                      📄 Exporter le rapport
+                    </button>
+                    <button
+                      onClick={handleRestart}
+                      className="bg-[#cda86b] text-white px-6 py-3 rounded-lg font-medium hover:bg-[#004235] transition-colors flex items-center justify-center"
+                    >
+                      🔄 Recommencer l'évaluation
+                    </button>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-2">
+                    Le rapport inclut votre profil complet et toutes les recommandations
+                  </p>
                 </div>
               </>
             )}
