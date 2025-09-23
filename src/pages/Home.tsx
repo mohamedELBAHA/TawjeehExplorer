@@ -238,11 +238,11 @@ const LandingPage = () => {
                 <div className="space-y-4">
                   <h1 className="text-5xl lg:text-6xl font-bold leading-tight">
                     <span className="text-black">
-                      Trouvez
+                      Nous guidons chaque étudiant 
                     </span>
                     <br />
                     <span className="text-black">
-                      votre école idéale
+                      vers son avenir
                     </span>
                     <br />
                     <span className="text-black">
@@ -370,11 +370,11 @@ const LandingPage = () => {
       <section className="mb-20 mt-12">
         <h2 className="text-3xl font-bold text-center text-gray-900 mb-8">Choisissez votre expérience</h2>
         <div className="flex flex-col md:flex-row justify-center gap-8">
-          {/* Freemium Plan */}
+          {/* Free Plan */}
           <div className="flex-1 bg-white rounded-xl shadow-lg p-8 border border-gray-100 hover:shadow-2xl transition-shadow duration-300 max-w-md mx-auto md:mx-0">
             <div className="flex items-center mb-4">
               <span className="text-2xl mr-2">🔥</span>
-              <span className="text-xl font-bold text-[#004235]">Freemium</span>
+              <span className="text-xl font-bold text-[#004235]">Free</span>
               <span className="ml-2 text-sm text-gray-500">Basic Access</span>
             </div>
             <ul className="space-y-2 text-gray-700 mb-6">

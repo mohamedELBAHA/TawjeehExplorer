@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { schoolsData, School } from '../data/schools';
+import { useLicense } from '../contexts/LicenseContext';
 
 interface StudentProfile {
   bacType: string;
@@ -41,11 +42,13 @@ const STEPS = [
 ];
 
 const BAC_TYPES = [
-  "Sciences Mathématiques",
+  "Sciences Mathématiques A",
+  "Sciences Mathématiques B",
   "Sciences Physiques", 
   "Sciences de la Vie et de la Terre",
-  "Sciences de l'Ingénieur",
-  "Sciences Économiques"
+  "Sciences Économiques",
+  "Bac Technique",
+  "Bac Professionnel"
 ];
 
 const CITIES = [
@@ -59,6 +62,7 @@ const FIELDS = [
 ];
 
 const StudentMatcher: React.FC<{ onClose: () => void }> = ({ onClose }) => {
+  const { hasFeature, licenseInfo } = useLicense();
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [studentProfile, setStudentProfile] = useState<StudentProfile>({
@@ -103,10 +107,21 @@ const StudentMatcher: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
           // Grade Match (20%)
           const averageGrade = Object.values(studentProfile.grades).reduce((a, b) => a + b, 0) / 5;
-          if (school.seuilEntree !== 'NA' && averageGrade >= school.seuilEntree) {
-            score += 20;
-            reasons.push(`Votre moyenne (${averageGrade.toFixed(1)}) dépasse le seuil requis`);
-          } else if (school.seuilEntree === 'NA') {
+          if (school.seuilEntree !== 'NA') {
+            if (typeof school.seuilEntree === 'number') {
+              if (averageGrade >= school.seuilEntree) {
+                score += 20;
+                reasons.push(`Votre moyenne (${averageGrade.toFixed(1)}) dépasse le seuil requis`);
+              }
+            } else {
+              // Handle object-based seuil
+              const bacTypeSeuilEntree = school.seuilEntree[studentProfile.bacType];
+              if (bacTypeSeuilEntree && averageGrade >= bacTypeSeuilEntree) {
+                score += 20;
+                reasons.push(`Votre moyenne (${averageGrade.toFixed(1)}) dépasse le seuil requis (${bacTypeSeuilEntree})`);
+              }
+            }
+          } else {
             score += 10;
             reasons.push('Seuil d\'admission flexible');
           }
@@ -170,6 +185,11 @@ const StudentMatcher: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   };
 
   const exportResults = () => {
+    if (!hasFeature('export_reports')) {
+      alert('Cette fonctionnalité nécessite une licence valide. Votre licence actuelle ne permet pas l\'export de rapports.');
+      return;
+    }
+    
     const averageGrade = Object.values(studentProfile.grades).reduce((a, b) => a + b, 0) / 5;
     const currentDate = new Date().toLocaleDateString('fr-FR');
     
@@ -216,7 +236,11 @@ ${index + 1}. ${result.school.name}
    Ville: ${result.school.city}
    Type: ${result.school.type}
    Filière: ${result.school.filiere}
-   Seuil d'entrée: ${result.school.seuilEntree}/20
+   Seuil d'entrée: ${typeof result.school.seuilEntree === 'object' && result.school.seuilEntree !== null
+     ? Object.entries(result.school.seuilEntree)
+         .map(([bacType, seuil]) => `${bacType}: ${seuil}/20`)
+         .join(', ')
+     : `${result.school.seuilEntree}/20`}
    
    Description:
    ${result.school.description}
@@ -272,7 +296,7 @@ Pour plus d'informations, consultez notre plateforme:
 https://tawjeeh-explorer.com
 
 Rapport généré automatiquement par Tawjeeh Explorer
-© 2024 - Assistant d'orientation intelligent pour étudiants marocains
+© 2025 - Assistant d'orientation intelligent pour étudiants marocains
 `;
 
     // Create and download the file
@@ -629,12 +653,31 @@ Rapport généré automatiquement par Tawjeeh Explorer
                         </ul>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div className="grid grid-cols-1 gap-4 text-sm">
                         <div>
                           <span className="font-medium">Filière:</span> {result.school.filiere}
                         </div>
                         <div>
-                          <span className="font-medium">Seuil:</span> {result.school.seuilEntree}/20
+                          <span className="font-medium">Seuils d'admission:</span>
+                          {typeof result.school.seuilEntree === 'object' && result.school.seuilEntree !== null ? (
+                            <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                              {Object.entries(result.school.seuilEntree).map(([bacType, seuil]) => (
+                                <div 
+                                  key={bacType} 
+                                  className={`px-3 py-2 rounded-lg text-xs border ${
+                                    bacType === studentProfile.bacType 
+                                      ? 'bg-green-100 border-green-300 text-green-800 font-medium' 
+                                      : 'bg-gray-50 border-gray-200 text-gray-600'
+                                  }`}
+                                >
+                                  <div className="font-medium">{bacType}</div>
+                                  <div className="text-lg font-bold">{seuil}/20</div>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <span className="ml-2">{result.school.seuilEntree}/20</span>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -645,9 +688,16 @@ Rapport généré automatiquement par Tawjeeh Explorer
                   <div className="flex flex-col sm:flex-row gap-3 justify-center">
                     <button
                       onClick={exportResults}
-                      className="bg-[#004235] text-white px-6 py-3 rounded-lg font-medium hover:bg-[#cda86b] transition-colors flex items-center justify-center"
+                      disabled={!hasFeature('export_reports')}
+                      className={`px-6 py-3 rounded-lg font-medium transition-colors flex items-center justify-center ${
+                        hasFeature('export_reports')
+                          ? 'bg-[#004235] text-white hover:bg-[#cda86b]'
+                          : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      }`}
+                      title={!hasFeature('export_reports') ? 'Fonctionnalité réservée aux licences complètes' : ''}
                     >
                       📄 Exporter le rapport
+                      {!hasFeature('export_reports') && <span className="ml-2">🔒</span>}
                     </button>
                     <button
                       onClick={handleRestart}

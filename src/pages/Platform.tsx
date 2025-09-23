@@ -6,6 +6,9 @@ import { Range } from 'react-range';
 import type { LatLngExpression } from 'leaflet';
 import L from 'leaflet';
 import ChatbotWidget from '../components/ChatbotWidget';
+import { useLicense } from '../contexts/LicenseContext';
+import LicenseManagement from '../components/LicenseManagement';
+import { Search, Filter, ChevronDown } from 'lucide-react';
 
 // Fix for default markers not showing in production
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -51,6 +54,7 @@ const SEUIL_MAX = 20;
 const SEUIL_STEP = 0.5;
 
 const Platform: React.FC = () => {
+  const { hasFeature, licenseInfo } = useLicense();
   const [selectedFiliere, setSelectedFiliere] = useState<string>('');
   const [selectedCity, setSelectedCity] = useState<string>('');
   const [selectedBacType, setSelectedBacType] = useState<string>('');
@@ -59,6 +63,8 @@ const Platform: React.FC = () => {
   const [expandedSchools, setExpandedSchools] = useState<Set<number>>(new Set());
   const [highlightedSchoolId, setHighlightedSchoolId] = useState<number | null>(null);
   const [showMatcherNotification, setShowMatcherNotification] = useState(true);
+  const [showLicenseManagement, setShowLicenseManagement] = useState(false);
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   
   // Advanced filters state
   const [selectedPublicPrivate, setSelectedPublicPrivate] = useState<string>('');
@@ -94,7 +100,10 @@ const Platform: React.FC = () => {
       const cityMatch = !selectedCity || school.city === selectedCity;
       const bacTypeMatch = !selectedBacType || school.bacTypes.includes(selectedBacType);
       const institutionTypeMatch = !selectedInstitutionType || school.type === selectedInstitutionType;
-      const seuilMatch = school.seuilEntree === 'NA' || school.seuilEntree >= seuilValue;
+      const seuilMatch = school.seuilEntree === 'NA' || 
+        (typeof school.seuilEntree === 'number' && school.seuilEntree >= seuilValue) ||
+        (typeof school.seuilEntree === 'object' && school.seuilEntree !== null && 
+         Object.values(school.seuilEntree).some(seuil => seuil >= seuilValue));
       
       // Advanced filters
       const publicPrivateMatch = !selectedPublicPrivate || 
@@ -169,10 +178,40 @@ const Platform: React.FC = () => {
             <div className="flex items-center">
               <h1 className="text-2xl font-bold text-white">Tawjeeh Navigator</h1>
             </div>
-            <nav className="flex space-x-8">
-              <a href="/" className="text-gray-200 hover:text-[#cda86b] transition-colors">Accueil</a>
-              <a href="/platform" className="text-[#cda86b] font-medium">Plateforme</a>
-            </nav>
+            <div className="flex items-center space-x-8">
+              <nav className="flex space-x-8">
+                <a href="/" className="text-gray-200 hover:text-[#cda86b] transition-colors">Accueil</a>
+                <a href="/platform" className="text-[#cda86b] font-medium">Plateforme</a>
+              </nav>
+              
+              {/* License Status */}
+              {licenseInfo?.isValid && (
+                <div className="flex items-center space-x-3 pl-8 border-l border-white/20">
+                  <div className="w-6 h-6 bg-gradient-to-br from-[#cda86b] to-[#b8956a] rounded-full flex items-center justify-center shadow-lg border border-[#cda86b]/30">
+                    <svg className="w-3.5 h-3.5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <span className="text-[#cda86b] font-medium text-sm tracking-wide">Licence Active</span>
+                  <div className="text-white/70 text-xs font-light">
+                    Expire le {licenseInfo.expirationDate?.toLocaleDateString('fr-FR')}
+                  </div>
+                  <button
+                    onClick={() => {
+                      localStorage.removeItem('tawjeeh_license');
+                      localStorage.removeItem('tawjeeh_email');
+                      window.location.reload();
+                    }}
+                    className="flex items-center space-x-1 text-white/60 hover:text-[#cda86b] transition-all duration-200 bg-white/10 hover:bg-white/20 px-2 py-1 rounded-lg backdrop-blur-sm border border-white/20 hover:border-[#cda86b]/50"
+                  >
+                    <span className="text-xs font-medium">Déconnexion</span>
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </header>
@@ -223,181 +262,213 @@ const Platform: React.FC = () => {
         </div>
       )}
 
-      {/* Horizontal Filter Bar */}
-      <div className="bg-gray-100 border-b border-gray-300 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="space-y-4">
-            {/* First Row - Basic Filters */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-              {/* Filiere Filter */}
-              <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">Filière</label>
-                <select 
-                  value={selectedFiliere} 
-                  onChange={(e) => {
-                    setSelectedFiliere(e.target.value);
-                    // Reset specialty when filière changes
-                    if (e.target.value !== 'Ingénierie') {
-                      setSelectedSpecialty('');
-                    }
-                  }}
-                  className="w-full p-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-[#004235] focus:border-[#004235]"
-                >
-                  <option value="">Toutes les filières</option>
-                  {uniqueFilieres.map(filiere => (
-                    <option key={filiere} value={filiere}>{filiere}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* City Filter */}
-              <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">Ville</label>
-                <select 
-                  value={selectedCity} 
-                  onChange={(e) => setSelectedCity(e.target.value)}
-                  className="w-full p-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-[#004235] focus:border-[#004235]"
-                >
-                  <option value="">Toutes les villes</option>
-                  {uniqueCities.map(city => (
-                    <option key={city} value={city}>{city}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Bac Type Filter */}
-              <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">Type de Bac</label>
-                <select 
-                  value={selectedBacType} 
-                  onChange={(e) => setSelectedBacType(e.target.value)}
-                  className="w-full p-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-[#004235] focus:border-[#004235]"
-                >
-                  <option value="">Tous les types</option>
-                  {uniqueBacTypes.map(bacType => (
-                    <option key={bacType} value={bacType}>
-                      {bacType.length > 20 ? bacType.substring(0, 20) + '...' : bacType}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Institution Type Filter */}
-              <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">Type d'établissement</label>
-                <select 
-                  value={selectedInstitutionType} 
-                  onChange={(e) => setSelectedInstitutionType(e.target.value)}
-                  className="w-full p-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-[#004235] focus:border-[#004235]"
-                >
-                  <option value="">Tous les types</option>
-                  {uniqueInstitutionTypes.map(type => (
-                    <option key={type} value={type}>{type}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Seuil Filter */}
-              <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">Seuil</label>
-                <div className="flex items-center justify-center bg-white border border-gray-300 rounded-md p-2 w-fit">
-                  <button
-                    onClick={() => setSeuilValue(Math.max(SEUIL_MIN, seuilValue - SEUIL_STEP))}
-                    disabled={seuilValue <= SEUIL_MIN}
-                    className="w-7 h-7 flex items-center justify-center bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:text-gray-300 rounded-full transition-colors text-gray-600 font-bold text-sm"
-                  >
-                    −
-                  </button>
-                  <div className="mx-3 min-w-[3rem] text-center">
-                    <span className="text-sm font-bold text-[#004235]">{seuilValue}</span>
-                    <span className="text-xs text-gray-500">/20</span>
-                  </div>
-                  <button
-                    onClick={() => setSeuilValue(Math.min(SEUIL_MAX, seuilValue + SEUIL_STEP))}
-                    disabled={seuilValue >= SEUIL_MAX}
-                    className="w-7 h-7 flex items-center justify-center bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:text-gray-300 rounded-full transition-colors text-gray-600 font-bold text-sm"
-                  >
-                    +
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Second Row - Advanced Filters */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-              {/* Public/Private Filter */}
-              <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">Secteur</label>
-                <select 
-                  value={selectedPublicPrivate} 
-                  onChange={(e) => setSelectedPublicPrivate(e.target.value)}
-                  className="w-full p-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-[#004235] focus:border-[#004235]"
-                >
-                  <option value="">Public et Privé</option>
-                  <option value="public">🏛️ Public uniquement</option>
-                  <option value="private">🏢 Privé uniquement</option>
-                </select>
-              </div>
-
-              {/* Concours Requirement Filter */}
-              <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">Mode d'admission</label>
-                <select 
-                  value={selectedConcoursType} 
-                  onChange={(e) => setSelectedConcoursType(e.target.value)}
-                  className="w-full p-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-[#004235] focus:border-[#004235]"
-                >
-                  <option value="">Tous les modes</option>
-                  <option value="with-concours">📝 Avec concours</option>
-                  <option value="without-concours">✅ Sans concours</option>
-                </select>
-              </div>
-
-              {/* Admission Type Filter */}
-              <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">Type d'admission</label>
-                <select 
-                  value={selectedAdmissionType} 
-                  onChange={(e) => setSelectedAdmissionType(e.target.value)}
-                  className="w-full p-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-[#004235] focus:border-[#004235]"
-                >
-                  <option value="">Tous les types</option>
-                  <option value="Concours">🏆 Concours</option>
-                  <option value="Preselection">📋 Présélection</option>
-                  <option value="Combined">🔄 Mixte</option>
-                  <option value="Direct">⚡ Accès direct</option>
-                </select>
-              </div>
-
-              {/* Specialty Filter - Only shown when Ingénierie is selected */}
-              {selectedFiliere === 'Ingénierie' && (
+      {/* Premium Filter Panel */}
+      <div className="bg-white border-b border-gray-200 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Main Filter Bar */}
+          <div className="py-4">
+            <div className="flex flex-wrap items-center gap-3">
+              {/* Core Essential Filters */}
+              <div className="flex items-center gap-3">
+                {/* Type de Bac - Most Important */}
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">Spécialité</label>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">Type de Bac</label>
                   <select 
-                    value={selectedSpecialty} 
-                    onChange={(e) => setSelectedSpecialty(e.target.value)}
-                    className="w-full p-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-[#004235] focus:border-[#004235]"
+                    value={selectedBacType} 
+                    onChange={(e) => setSelectedBacType(e.target.value)}
+                    className="px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#004235] focus:border-[#004235] bg-white min-w-[180px] font-medium"
                   >
-                    <option value="">Toutes les spécialités</option>
-                    {availableSpecialties.map(specialty => (
-                      <option key={specialty} value={specialty}>{specialty}</option>
+                    <option value="">Sélectionnez votre Bac</option>
+                    {uniqueBacTypes.map(bacType => (
+                      <option key={bacType} value={bacType}>
+                        {bacType.length > 30 ? bacType.substring(0, 30) + '...' : bacType}
+                      </option>
                     ))}
                   </select>
                 </div>
-              )}
-            </div>
 
-            {/* Results and Actions Row */}
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              <span className="text-sm text-gray-600">
-                {filteredSchools.length} écoles trouvées
-              </span>
-              <button
-                onClick={clearAllFilters}
-                className="px-3 py-2 text-sm bg-white text-gray-700 rounded-md hover:bg-gray-50 transition-colors border border-gray-300"
-              >
-                Réinitialiser tous les filtres
-              </button>
+                {/* Type d'établissement - Second Most Important */}
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">Type d'établissement</label>
+                  <select 
+                    value={selectedInstitutionType} 
+                    onChange={(e) => setSelectedInstitutionType(e.target.value)}
+                    className="px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#004235] focus:border-[#004235] bg-white min-w-[160px] font-medium"
+                  >
+                    <option value="">Type d'établissement</option>
+                    {uniqueInstitutionTypes.map(type => (
+                      <option key={type} value={type}>{type}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Filiere Filter */}
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">Filière</label>
+                  <select 
+                    value={selectedFiliere} 
+                    onChange={(e) => {
+                      setSelectedFiliere(e.target.value);
+                      if (e.target.value !== 'Ingénierie') {
+                        setSelectedSpecialty('');
+                      }
+                    }}
+                    className="px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#004235] focus:border-[#004235] bg-white min-w-[140px] font-medium"
+                  >
+                    <option value="">Toutes filières</option>
+                    {uniqueFilieres.map(filiere => (
+                      <option key={filiere} value={filiere}>{filiere}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* City Filter */}
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">Ville</label>
+                  <select 
+                    value={selectedCity} 
+                    onChange={(e) => setSelectedCity(e.target.value)}
+                    className="px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#004235] focus:border-[#004235] bg-white min-w-[130px] font-medium"
+                  >
+                    <option value="">Toutes villes</option>
+                    {uniqueCities.map(city => (
+                      <option key={city} value={city}>{city}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Seuil Filter */}
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">Seuil minimum</label>
+                  <div className="flex items-center bg-white border border-gray-300 rounded-lg px-3 py-2">
+                    <button
+                      onClick={() => setSeuilValue(Math.max(SEUIL_MIN, seuilValue - SEUIL_STEP))}
+                      disabled={seuilValue <= SEUIL_MIN}
+                      className="w-6 h-6 flex items-center justify-center bg-gray-100 hover:bg-gray-200 disabled:opacity-50 rounded-full transition-colors text-gray-600 text-xs font-bold"
+                    >
+                      −
+                    </button>
+                    <div className="mx-3 min-w-[2.5rem] text-center">
+                      <span className="text-sm font-bold text-[#004235]">{seuilValue}</span>
+                      <span className="text-xs text-gray-400">/20</span>
+                    </div>
+                    <button
+                      onClick={() => setSeuilValue(Math.min(SEUIL_MAX, seuilValue + SEUIL_STEP))}
+                      disabled={seuilValue >= SEUIL_MAX}
+                      className="w-6 h-6 flex items-center justify-center bg-gray-100 hover:bg-gray-200 disabled:opacity-50 rounded-full transition-colors text-gray-600 text-xs font-bold"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Side Controls */}
+              <div className="flex items-center gap-3 ml-auto">
+                {/* Advanced Filters Toggle */}
+                <button
+                  onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+                  className={`px-4 py-2.5 text-sm rounded-lg border transition-all duration-200 flex items-center gap-2 ${
+                    showAdvancedFilters 
+                      ? 'bg-[#004235] text-white border-[#004235]' 
+                      : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                  }`}
+                >
+                  <Filter className="w-4 h-4" />
+                  <span>Plus de filtres</span>
+                  <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${showAdvancedFilters ? 'rotate-180' : ''}`} />
+                </button>
+
+                {/* Results Counter */}
+                <div className="px-4 py-2.5 bg-gray-50 rounded-lg border border-gray-200">
+                  <span className="text-sm font-medium text-gray-700">
+                    {filteredSchools.length} école{filteredSchools.length !== 1 ? 's' : ''}
+                  </span>
+                </div>
+
+                {/* Clear Filters */}
+                {(selectedFiliere || selectedCity || seuilValue > SEUIL_MIN || selectedBacType || selectedInstitutionType || selectedPublicPrivate || selectedConcoursType || selectedAdmissionType || selectedSpecialty) && (
+                  <button
+                    onClick={clearAllFilters}
+                    className="px-3 py-2.5 text-sm text-gray-600 hover:text-gray-800 transition-colors"
+                  >
+                    Effacer
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Advanced Filters Panel */}
+          <div className={`overflow-hidden transition-all duration-300 ease-out ${
+            showAdvancedFilters ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+          }`}>
+            <div className="pb-4 border-t border-gray-100">
+              <div className="pt-4 space-y-4">
+                {/* Advanced Filters Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {/* Public/Private Filter */}
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-2">Secteur</label>
+                    <select 
+                      value={selectedPublicPrivate} 
+                      onChange={(e) => setSelectedPublicPrivate(e.target.value)}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#004235] focus:border-[#004235] bg-white"
+                    >
+                      <option value="">Public et Privé</option>
+                      <option value="public">🏛️ Public uniquement</option>
+                      <option value="private">🏢 Privé uniquement</option>
+                    </select>
+                  </div>
+
+                  {/* Concours Requirement Filter */}
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-2">Mode d'admission</label>
+                    <select 
+                      value={selectedConcoursType} 
+                      onChange={(e) => setSelectedConcoursType(e.target.value)}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#004235] focus:border-[#004235] bg-white"
+                    >
+                      <option value="">Tous les modes</option>
+                      <option value="with-concours">📝 Avec concours</option>
+                      <option value="without-concours">✅ Sans concours</option>
+                    </select>
+                  </div>
+
+                  {/* Admission Type Filter */}
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-2">Type d'admission</label>
+                    <select 
+                      value={selectedAdmissionType} 
+                      onChange={(e) => setSelectedAdmissionType(e.target.value)}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#004235] focus:border-[#004235] bg-white"
+                    >
+                      <option value="">Tous les types</option>
+                      <option value="Concours">🏆 Concours</option>
+                      <option value="Preselection">📋 Présélection</option>
+                      <option value="Combined">🔄 Mixte</option>
+                      <option value="Direct">⚡ Accès direct</option>
+                    </select>
+                  </div>
+
+                  {/* Specialty Filter - Only shown when Ingénierie is selected */}
+                  {selectedFiliere === 'Ingénierie' && (
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-2">Spécialité</label>
+                      <select 
+                        value={selectedSpecialty} 
+                        onChange={(e) => setSelectedSpecialty(e.target.value)}
+                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#004235] focus:border-[#004235] bg-white"
+                      >
+                        <option value="">Toutes les spécialités</option>
+                        {availableSpecialties.map(specialty => (
+                          <option key={specialty} value={specialty}>{specialty}</option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -432,7 +503,11 @@ const Platform: React.FC = () => {
                     <Popup>
                       <div className="font-semibold">{school.name}</div>
                       <div className="text-xs text-gray-600">{school.city}</div>
-                      <div className="text-xs text-[#cda86b] font-bold mt-1">Seuil: {school.seuilEntree}/20</div>
+                      <div className="text-xs text-[#cda86b] font-bold mt-1">
+                        Seuil: {typeof school.seuilEntree === 'object' && school.seuilEntree !== null
+                          ? `${Math.min(...Object.values(school.seuilEntree))}-${Math.max(...Object.values(school.seuilEntree))}/20`
+                          : `${school.seuilEntree}/20`}
+                      </div>
                       <button 
                         onClick={() => handleMarkerClick(school.id)}
                         className="mt-2 text-xs bg-[#004235] text-white px-2 py-1 rounded hover:bg-[#cda86b] transition-colors"
@@ -487,10 +562,22 @@ const Platform: React.FC = () => {
                           </div>
                         </div>
                         <div className="text-right ml-4">
-                          <div className="text-lg font-bold text-[#cda86b]">
-                            {school.seuilEntree}/20
-                          </div>
-                          <div className="text-xs text-gray-500">Seuil d'entrée</div>
+                          <div className="text-sm font-medium text-gray-700 mb-1">Seuils d'admission</div>
+                          {typeof school.seuilEntree === 'object' && school.seuilEntree !== null ? (
+                            <div className="space-y-1">
+                              <div className="text-xs text-[#cda86b] font-bold">
+                                {Math.min(...Object.values(school.seuilEntree))}-{Math.max(...Object.values(school.seuilEntree))}/20
+                              </div>
+                              <div className="text-xs text-gray-500">Par bac</div>
+                            </div>
+                          ) : (
+                            <>
+                              <div className="text-lg font-bold text-[#cda86b]">
+                                {school.seuilEntree}/20
+                              </div>
+                              <div className="text-xs text-gray-500">Seuil d'entrée</div>
+                            </>
+                          )}
                         </div>
                       </div>
 
@@ -544,6 +631,27 @@ const Platform: React.FC = () => {
                                     ))}
                                   </div>
                                 </div>
+                                
+                                {/* Seuils d'admission detaillés */}
+                                <div>
+                                  <span className="font-medium">Seuils d'admission:</span>
+                                  {typeof school.seuilEntree === 'object' && school.seuilEntree !== null ? (
+                                    <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                      {Object.entries(school.seuilEntree).map(([bacType, seuil]) => (
+                                        <div 
+                                          key={bacType} 
+                                          className="px-2 py-1 rounded bg-blue-50 border border-blue-200 text-blue-800"
+                                        >
+                                          <div className="font-medium text-xs">{bacType}</div>
+                                          <div className="text-sm font-bold">{seuil}/20</div>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  ) : (
+                                    <span className="ml-2 font-medium">{school.seuilEntree}/20</span>
+                                  )}
+                                </div>
+                                
                                 <div>Filière: <span className="font-medium">{school.filiere}</span></div>
                                 <div>Salaire moyen: <span className="font-medium">{school.averageSalary?.toLocaleString()} MAD</span></div>
                               </div>
@@ -607,6 +715,11 @@ const Platform: React.FC = () => {
           <ChatbotWidget />
         </div>
       </div>
+
+      {/* License Management Modal */}
+      {showLicenseManagement && (
+        <LicenseManagement onClose={() => setShowLicenseManagement(false)} />
+      )}
     </div>
   );
 };
