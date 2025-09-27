@@ -7,6 +7,8 @@ interface LicenseInfo {
   expirationDate: Date | null;
   userEmail: string;
   features: string[];
+  plan?: string;
+  maxUsers?: number;
 }
 
 interface LicenseValidatorProps {
@@ -14,8 +16,7 @@ interface LicenseValidatorProps {
   onLicenseValidated?: (licenseInfo: LicenseInfo) => void;
 }
 
-const DEMO_LICENSE = "DEMO-TAWJEEH-2025-FREE";
-const DEMO_EXPIRATION = new Date('2025-12-31');
+const API_BASE_URL = 'http://localhost:5000';
 
 const LicenseValidator: React.FC<LicenseValidatorProps> = ({ children, onLicenseValidated }) => {
   const { licenseInfo, setLicenseInfo } = useLicense();
@@ -29,30 +30,80 @@ const LicenseValidator: React.FC<LicenseValidatorProps> = ({ children, onLicense
     // Check if license exists in localStorage
     const storedLicense = localStorage.getItem('tawjeeh_license');
     const storedEmail = localStorage.getItem('tawjeeh_email');
+    const storedSessionToken = localStorage.getItem('tawjeeh_session');
     
-    if (storedLicense && storedEmail) {
+    if (storedLicense && storedEmail && storedSessionToken) {
+      // Validate existing session
+      validateSession(storedSessionToken, storedLicense);
+    } else if (storedLicense && storedEmail) {
+      // Re-validate license if session expired
       validateLicense(storedLicense, storedEmail);
     } else {
       setShowLicensePrompt(true);
     }
   }, []);
 
-  const validateLicense = (license: string, email: string) => {
+  const validateSession = async (sessionToken: string, licenseKey: string) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/check-session`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          sessionToken,
+          licenseKey
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success && data.valid) {
+        // Session is still valid, we can continue with stored license info
+        const storedLicenseData = localStorage.getItem('tawjeeh_license_data');
+        if (storedLicenseData) {
+          const licenseInfo = JSON.parse(storedLicenseData);
+          licenseInfo.expirationDate = new Date(licenseInfo.expirationDate);
+          setLicenseInfo(licenseInfo);
+          return;
+        }
+      }
+      
+      // Session invalid, show prompt
+      setShowLicensePrompt(true);
+    } catch (error) {
+      console.error('Session validation failed:', error);
+      setShowLicensePrompt(true);
+    }
+  };
+
+  const validateLicense = async (license: string, email: string) => {
     setIsLoading(true);
     setError('');
 
-    // Simulate license validation
-    setTimeout(() => {
-      const isValidDemo = license === DEMO_LICENSE;
-      const isNotExpired = new Date() <= DEMO_EXPIRATION;
-      
-      if (isValidDemo && isNotExpired) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/validate-license`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          licenseKey: license,
+          userEmail: email
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success && data.license) {
         const validLicense: LicenseInfo = {
           isValid: true,
-          licenseKey: license,
-          expirationDate: DEMO_EXPIRATION,
-          userEmail: email,
-          features: ['student_matcher', 'school_database', 'map_view', 'export_reports']
+          licenseKey: data.license.licenseKey,
+          expirationDate: new Date(data.license.expirationDate),
+          userEmail: data.license.userEmail,
+          features: data.license.features,
+          plan: data.license.plan,
+          maxUsers: data.license.maxUsers
         };
         
         setLicenseInfo(validLicense);
@@ -61,16 +112,19 @@ const LicenseValidator: React.FC<LicenseValidatorProps> = ({ children, onLicense
         // Store in localStorage
         localStorage.setItem('tawjeeh_license', license);
         localStorage.setItem('tawjeeh_email', email);
+        localStorage.setItem('tawjeeh_session', data.sessionToken);
+        localStorage.setItem('tawjeeh_license_data', JSON.stringify(validLicense));
         
         onLicenseValidated?.(validLicense);
-      } else if (isValidDemo && !isNotExpired) {
-        setError('Cette licence de démonstration a expiré. Contactez-nous pour une nouvelle licence.');
       } else {
-        setError('Clé de licence invalide. Vérifiez votre clé ou contactez le support.');
+        setError(data.error || 'Erreur de validation de licence');
       }
-      
+    } catch (error) {
+      console.error('License validation failed:', error);
+      setError('Erreur de connexion au serveur. Vérifiez votre connexion internet.');
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -85,6 +139,8 @@ const LicenseValidator: React.FC<LicenseValidatorProps> = ({ children, onLicense
   const handleLogout = () => {
     localStorage.removeItem('tawjeeh_license');
     localStorage.removeItem('tawjeeh_email');
+    localStorage.removeItem('tawjeeh_session');
+    localStorage.removeItem('tawjeeh_license_data');
     setLicenseInfo(null);
     setShowLicensePrompt(true);
     setInputLicense('');
@@ -159,16 +215,33 @@ const LicenseValidator: React.FC<LicenseValidatorProps> = ({ children, onLicense
           </form>
 
           <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-            <h3 className="font-medium text-blue-900 mb-2">🎯 Licence de démonstration</h3>
-            <p className="text-sm text-blue-700 mb-2">
-              Utilisez cette clé pour tester la plateforme :
-            </p>
-            <code className="bg-blue-100 text-blue-900 px-2 py-1 rounded text-sm">
-              DEMO-TAWJEEH-2025-FREE
-            </code>
-            <p className="text-xs text-blue-600 mt-2">
-              Valide jusqu'au 31 décembre 2025
-            </p>
+            <h3 className="font-medium text-blue-900 mb-2">🎯 Licences de test disponibles</h3>
+            
+            <div className="space-y-3">
+              <div>
+                <p className="text-sm text-blue-700 mb-1">
+                  <strong>Démonstration gratuite :</strong>
+                </p>
+                <code className="bg-blue-100 text-blue-900 px-2 py-1 rounded text-sm block">
+                  DEMO-TAWJEEH-2025-FREE
+                </code>
+                <p className="text-xs text-blue-600 mt-1">
+                  Valide jusqu'au 31 décembre 2025 • Fonctionnalités de base
+                </p>
+              </div>
+              
+              <div>
+                <p className="text-sm text-blue-700 mb-1">
+                  <strong>Premium (admin@tawjeehexplorer.com uniquement) :</strong>
+                </p>
+                <code className="bg-blue-100 text-blue-900 px-2 py-1 rounded text-sm block">
+                  PREMIUM-TAWJEEH-2025-FULL
+                </code>
+                <p className="text-xs text-blue-600 mt-1">
+                  Valide jusqu'au 31 décembre 2026 • Toutes les fonctionnalités
+                </p>
+              </div>
+            </div>
           </div>
 
           <div className="mt-4 text-center">

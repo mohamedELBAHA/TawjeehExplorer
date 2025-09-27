@@ -6,6 +6,8 @@ interface LicenseInfo {
   expirationDate: Date | null;
   userEmail: string;
   features: string[];
+  plan?: string;
+  maxUsers?: number;
 }
 
 interface LicenseContextType {
@@ -13,6 +15,8 @@ interface LicenseContextType {
   setLicenseInfo: (info: LicenseInfo | null) => void;
   hasFeature: (feature: string) => boolean;
   isLicenseValid: () => boolean;
+  getLicensePlan: () => string;
+  getMaxUsers: () => number;
 }
 
 const LicenseContext = createContext<LicenseContextType | undefined>(undefined);
@@ -43,11 +47,21 @@ export const LicenseProvider: React.FC<LicenseProviderProps> = ({ children }) =>
     return true;
   };
 
+  const getLicensePlan = (): string => {
+    return licenseInfo?.plan || 'unknown';
+  };
+
+  const getMaxUsers = (): number => {
+    return licenseInfo?.maxUsers || 1;
+  };
+
   const value: LicenseContextType = {
     licenseInfo,
     setLicenseInfo,
     hasFeature,
     isLicenseValid,
+    getLicensePlan,
+    getMaxUsers,
   };
 
   return (
