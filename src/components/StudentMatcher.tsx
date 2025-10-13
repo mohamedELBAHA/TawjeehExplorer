@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { schoolsData, School } from '../data/schools';
-import { useLicense } from '../contexts/LicenseContext';
 
 interface StudentProfile {
   bacType: string;
@@ -62,7 +61,6 @@ const FIELDS = [
 ];
 
 const StudentMatcher: React.FC<{ onClose: () => void }> = ({ onClose }) => {
-  const { hasFeature, licenseInfo } = useLicense();
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [studentProfile, setStudentProfile] = useState<StudentProfile>({
@@ -185,11 +183,6 @@ const StudentMatcher: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   };
 
   const exportResults = () => {
-    if (!hasFeature('export_reports')) {
-      alert('Cette fonctionnalité nécessite une licence valide. Votre licence actuelle ne permet pas l\'export de rapports.');
-      return;
-    }
-    
     const averageGrade = Object.values(studentProfile.grades).reduce((a, b) => a + b, 0) / 5;
     const currentDate = new Date().toLocaleDateString('fr-FR');
     
@@ -688,16 +681,9 @@ Rapport généré automatiquement par Tawjeeh Explorer
                   <div className="flex flex-col sm:flex-row gap-3 justify-center">
                     <button
                       onClick={exportResults}
-                      disabled={!hasFeature('export_reports')}
-                      className={`px-6 py-3 rounded-lg font-medium transition-colors flex items-center justify-center ${
-                        hasFeature('export_reports')
-                          ? 'bg-[#004235] text-white hover:bg-[#cda86b]'
-                          : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                      }`}
-                      title={!hasFeature('export_reports') ? 'Fonctionnalité réservée aux licences complètes' : ''}
+                      className="bg-[#004235] text-white hover:bg-[#cda86b] px-6 py-3 rounded-lg font-medium transition-colors flex items-center justify-center"
                     >
                       📄 Exporter le rapport
-                      {!hasFeature('export_reports') && <span className="ml-2">🔒</span>}
                     </button>
                     <button
                       onClick={handleRestart}

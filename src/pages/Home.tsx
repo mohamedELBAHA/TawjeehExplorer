@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import { 
   MapPin, 
   Search, 
@@ -63,6 +64,7 @@ const createMoroccoIcon = () => {
 
 const LandingPage = () => {
   const navigate = useNavigate();
+  const { user, profile } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [currentStat, setCurrentStat] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
@@ -174,12 +176,41 @@ const LandingPage = () => {
                 <a href="#testimonials" className="text-gray-700 hover:text-[#004235] px-3 py-2 text-sm font-medium transition-colors">
                   Témoignages
                 </a>
-                <button 
-                  onClick={startLoading}
-                  className="bg-[#004235] text-white px-6 py-2 rounded-lg font-medium transition-all duration-300 hover:bg-[#cda86b] hover:text-white"
-                >
-                  Commencer
-                </button>
+                
+                {user ? (
+                  // Authenticated user navigation
+                  <>
+                    <button 
+                      onClick={() => navigate('/profile')}
+                      className="text-gray-700 hover:text-[#004235] px-3 py-2 text-sm font-medium transition-colors flex items-center space-x-1"
+                    >
+                      <span>👤</span>
+                      <span>{profile?.first_name || 'Profil'}</span>
+                    </button>
+                    <button 
+                      onClick={() => navigate('/platform')}
+                      className="bg-[#004235] text-white px-6 py-2 rounded-lg font-medium transition-all duration-300 hover:bg-[#cda86b] hover:text-white"
+                    >
+                      Plateforme
+                    </button>
+                  </>
+                ) : (
+                  // Non-authenticated user navigation
+                  <>
+                    <button 
+                      onClick={() => navigate('/login')}
+                      className="text-gray-700 hover:text-[#004235] px-3 py-2 text-sm font-medium transition-colors"
+                    >
+                      Se connecter
+                    </button>
+                    <button 
+                      onClick={startLoading}
+                      className="bg-[#004235] text-white px-6 py-2 rounded-lg font-medium transition-all duration-300 hover:bg-[#cda86b] hover:text-white"
+                    >
+                      Commencer
+                    </button>
+                  </>
+                )}
               </div>
             </div>
 
@@ -208,12 +239,41 @@ const LandingPage = () => {
               <a href="#testimonials" className="block px-3 py-2 text-gray-700 hover:text-[#004235] font-medium">
                 Témoignages
               </a>
-              <button 
-                onClick={startLoading}
-                className="px-8 py-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 bg-[#004235] text-white hover:bg-[#cda86b] hover:text-white"
-              >
-                Commencer
-              </button>
+              
+              {user ? (
+                // Authenticated user mobile navigation
+                <>
+                  <button 
+                    onClick={() => navigate('/profile')}
+                    className="block w-full text-left px-3 py-2 text-gray-700 hover:text-[#004235] font-medium flex items-center space-x-2"
+                  >
+                    <span>👤</span>
+                    <span>{profile?.first_name || 'Mon Profil'}</span>
+                  </button>
+                  <button 
+                    onClick={() => navigate('/platform')}
+                    className="block w-full mt-2 px-4 py-2 rounded-lg font-semibold transition-all duration-300 bg-[#004235] text-white hover:bg-[#cda86b] hover:text-white"
+                  >
+                    Plateforme
+                  </button>
+                </>
+              ) : (
+                // Non-authenticated user mobile navigation
+                <>
+                  <button 
+                    onClick={() => navigate('/login')}
+                    className="block w-full text-left px-3 py-2 text-gray-700 hover:text-[#004235] font-medium"
+                  >
+                    Se connecter
+                  </button>
+                  <button 
+                    onClick={startLoading}
+                    className="block w-full mt-2 px-4 py-2 rounded-lg font-semibold transition-all duration-300 bg-[#004235] text-white hover:bg-[#cda86b] hover:text-white"
+                  >
+                    Commencer
+                  </button>
+                </>
+              )}
             </div>
           </div>
         )}
@@ -366,49 +426,6 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Pricing Section */}
-      <section className="mb-20 mt-12">
-        <h2 className="text-3xl font-bold text-center text-gray-900 mb-8">Choisissez votre expérience</h2>
-        <div className="flex flex-col md:flex-row justify-center gap-8">
-          {/* Free Plan */}
-          <div className="flex-1 bg-white rounded-xl shadow-lg p-8 border border-gray-100 hover:shadow-2xl transition-shadow duration-300 max-w-md mx-auto md:mx-0">
-            <div className="flex items-center mb-4">
-              <span className="text-2xl mr-2">🔥</span>
-              <span className="text-xl font-bold text-[#004235]">Free</span>
-              <span className="ml-2 text-sm text-gray-500">Basic Access</span>
-            </div>
-            <ul className="space-y-2 text-gray-700 mb-6">
-              <li>• Basic search and filters</li>
-              <li>• Essential profiles</li>
-              <li>• Limited AI recommendations <span className="text-xs text-gray-400">(5/day)</span></li>
-              <li>• Basic chatbot</li>
-              <li>• Public scholarship info</li>
-            </ul>
-            <div className="text-3xl font-bold text-[#004235] mb-2">Gratuit</div>
-            <button className="w-full bg-[#004235] text-white py-3 rounded-lg font-semibold hover:bg-[#cda86b] hover:text-white transition-colors">Get Started Free</button>
-          </div>
-          {/* Premium Plan */}
-          <div className="flex-1 bg-[#004235] rounded-xl shadow-lg p-8 border-2 border-[#004235] hover:shadow-2xl transition-shadow duration-300 max-w-md mx-auto md:mx-0 text-white relative overflow-hidden">
-            <div className="flex items-center mb-4">
-              <span className="text-2xl mr-2">💎</span>
-              <span className="text-xl font-bold">Premium</span>
-              <span className="ml-2 text-sm text-[#cda86b]">Enhanced Experience</span>
-            </div>
-            <ul className="space-y-2 mb-6">
-              <li>• Unlimited AI recommendations</li>
-              <li>• Advanced filtering (scores, cost, satisfaction)</li>
-              <li>• Premium personalized chatbot</li>
-              <li>• Multiple shortlist management</li>
-              <li>• SMS/email deadline reminders</li>
-              <li>• Scholarship and real-time seat alerts</li>
-            </ul>
-            <div className="text-3xl font-bold mb-2">49 <span className="text-lg font-medium">MAD/an</span></div>
-            <button className="w-full bg-white text-[#004235] py-3 rounded-lg font-semibold hover:bg-[#cda86b] hover:text-white transition-colors">Upgrade to Premium</button>
-            <div className="absolute top-0 right-0 bg-[#cda86b] text-[#004235] text-xs font-bold px-3 py-1 rounded-bl-xl">Populaire</div>
-          </div>
-        </div>
-      </section>
-
       {/* Features Section */}
       <section id="features" className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -492,6 +509,51 @@ const LandingPage = () => {
           </div>
         </div>
       </section>
+
+
+      {/* Pricing Section */}
+      <section className="mb-20 mt-12">
+        <h2 className="text-3xl font-bold text-center text-gray-900 mb-8">Choisissez votre expérience</h2>
+        <div className="flex flex-col md:flex-row justify-center gap-8">
+          {/* Free Plan */}
+          <div className="flex-1 bg-white rounded-xl shadow-lg p-8 border border-gray-100 hover:shadow-2xl transition-shadow duration-300 max-w-md mx-auto md:mx-0">
+            <div className="flex items-center mb-4">
+              <span className="text-2xl mr-2">🔥</span>
+              <span className="text-xl font-bold text-[#004235]">Free</span>
+              <span className="ml-2 text-sm text-gray-500">Basic Access</span>
+            </div>
+            <ul className="space-y-2 text-gray-700 mb-6">
+              <li>• Basic search and filters</li>
+              <li>• Essential profiles</li>
+              <li>• Limited AI recommendations <span className="text-xs text-gray-400">(5/day)</span></li>
+              <li>• Basic chatbot</li>
+              <li>• Public scholarship info</li>
+            </ul>
+            <div className="text-3xl font-bold text-[#004235] mb-2">Gratuit</div>
+            <button className="w-full bg-[#004235] text-white py-3 rounded-lg font-semibold hover:bg-[#cda86b] hover:text-white transition-colors">Get Started Free</button>
+          </div>
+          {/* Premium Plan */}
+          <div className="flex-1 bg-[#004235] rounded-xl shadow-lg p-8 border-2 border-[#004235] hover:shadow-2xl transition-shadow duration-300 max-w-md mx-auto md:mx-0 text-white relative overflow-hidden">
+            <div className="flex items-center mb-4">
+              <span className="text-2xl mr-2">💎</span>
+              <span className="text-xl font-bold">Premium</span>
+              <span className="ml-2 text-sm text-[#cda86b]">Enhanced Experience</span>
+            </div>
+            <ul className="space-y-2 mb-6">
+              <li>• Unlimited AI recommendations</li>
+              <li>• Advanced filtering (scores, cost, satisfaction)</li>
+              <li>• Premium personalized chatbot</li>
+              <li>• Multiple shortlist management</li>
+              <li>• SMS/email deadline reminders</li>
+              <li>• Scholarship and real-time seat alerts</li>
+            </ul>
+            <div className="text-3xl font-bold mb-2">49 <span className="text-lg font-medium">MAD/an</span></div>
+            <button className="w-full bg-white text-[#004235] py-3 rounded-lg font-semibold hover:bg-[#cda86b] hover:text-white transition-colors">Upgrade to Premium</button>
+            <div className="absolute top-0 right-0 bg-[#cda86b] text-[#004235] text-xs font-bold px-3 py-1 rounded-bl-xl">Populaire</div>
+          </div>
+        </div>
+      </section>
+
 
       {/* Testimonials Section */}
       <section id="testimonials" className="py-20 bg-gradient-to-br from-[#004235] to-[#cda86b]">

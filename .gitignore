@@ -72,7 +72,7 @@ typings/
 .env.development.local
 .env.test.local
 .env.production.local
-.env.example
+# Note: .env.example should be tracked to show required variables
 
 # Parcel-bundler cache (https://parceljs.org/)
 .cache

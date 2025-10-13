@@ -1,4 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import { schoolsData, School } from '../data/schools';
 import { MapContainer, TileLayer, Marker, Popup, GeoJSON } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -6,9 +8,8 @@ import { Range } from 'react-range';
 import type { LatLngExpression } from 'leaflet';
 import L from 'leaflet';
 import ChatbotWidget from '../components/ChatbotWidget';
-import { useLicense } from '../contexts/LicenseContext';
-import LicenseManagement from '../components/LicenseManagement';
 import { Search, Filter, ChevronDown } from 'lucide-react';
+import { UserCircleIcon } from '@heroicons/react/24/outline';
 
 // Fix for default markers not showing in production
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -54,7 +55,7 @@ const SEUIL_MAX = 20;
 const SEUIL_STEP = 0.5;
 
 const Platform: React.FC = () => {
-  const { hasFeature, licenseInfo } = useLicense();
+  const { user } = useAuth();
   const [selectedFiliere, setSelectedFiliere] = useState<string>('');
   const [selectedCity, setSelectedCity] = useState<string>('');
   const [selectedBacType, setSelectedBacType] = useState<string>('');
@@ -63,7 +64,6 @@ const Platform: React.FC = () => {
   const [expandedSchools, setExpandedSchools] = useState<Set<number>>(new Set());
   const [highlightedSchoolId, setHighlightedSchoolId] = useState<number | null>(null);
   const [showMatcherNotification, setShowMatcherNotification] = useState(true);
-  const [showLicenseManagement, setShowLicenseManagement] = useState(false);
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   
   // Advanced filters state
@@ -182,35 +182,16 @@ const Platform: React.FC = () => {
               <nav className="flex space-x-8">
                 <a href="/" className="text-gray-200 hover:text-[#cda86b] transition-colors">Accueil</a>
                 <a href="/platform" className="text-[#cda86b] font-medium">Plateforme</a>
-              </nav>
-              
-              {/* License Status */}
-              {licenseInfo?.isValid && (
-                <div className="flex items-center space-x-3 pl-8 border-l border-white/20">
-                  <div className="w-6 h-6 bg-gradient-to-br from-[#cda86b] to-[#b8956a] rounded-full flex items-center justify-center shadow-lg border border-[#cda86b]/30">
-                    <svg className="w-3.5 h-3.5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                  <span className="text-[#cda86b] font-medium text-sm tracking-wide">Licence Active</span>
-                  <div className="text-white/70 text-xs font-light">
-                    Expire le {licenseInfo.expirationDate?.toLocaleDateString('fr-FR')}
-                  </div>
-                  <button
-                    onClick={() => {
-                      localStorage.removeItem('tawjeeh_license');
-                      localStorage.removeItem('tawjeeh_email');
-                      window.location.reload();
-                    }}
-                    className="flex items-center space-x-1 text-white/60 hover:text-[#cda86b] transition-all duration-200 bg-white/10 hover:bg-white/20 px-2 py-1 rounded-lg backdrop-blur-sm border border-white/20 hover:border-[#cda86b]/50"
+                {user && (
+                  <Link 
+                    to="/profile" 
+                    className="flex items-center space-x-1 text-gray-200 hover:text-[#cda86b] transition-colors"
                   >
-                    <span className="text-xs font-medium">Déconnexion</span>
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                    </svg>
-                  </button>
-                </div>
-              )}
+                    <UserCircleIcon className="h-5 w-5" />
+                    <span>Profile</span>
+                  </Link>
+                )}
+              </nav>
             </div>
           </div>
         </div>
@@ -715,11 +696,6 @@ const Platform: React.FC = () => {
           <ChatbotWidget />
         </div>
       </div>
-
-      {/* License Management Modal */}
-      {showLicenseManagement && (
-        <LicenseManagement onClose={() => setShowLicenseManagement(false)} />
-      )}
     </div>
   );
 };

@@ -7,14 +7,15 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "server": "node server.js",
-    "dev:full": "concurrently \"npm run server\" \"npm run dev\""
+    "server": "node server.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "Platform for Moroccan students to find and compare universities and programs",
   "dependencies": {
+    "@heroicons/react": "^2.2.0",
+    "@supabase/supabase-js": "^2.58.0",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "@vitejs/plugin-react": "^4.6.0",
