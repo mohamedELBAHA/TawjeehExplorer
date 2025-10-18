@@ -3,6 +3,7 @@ import { Calculator, RotateCcw, Target, TrendingUp, BookOpen } from 'lucide-reac
 import SimulatorCard from '../components/SimulatorCard';
 import ResultsDisplay from '../components/ResultsDisplay';
 import ScenarioHistory from '../components/ScenarioHistory';
+import PlatformHeader from '../components/PlatformHeader';
 
 interface BacNotes {
   regional: number | null;
@@ -80,18 +81,18 @@ const Simulateur: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 py-8">
-      <div className="container mx-auto px-4 max-w-6xl">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-full mb-4">
-            <Calculator className="w-8 h-8 text-white" />
-          </div>
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">
-            Simulateur de Notes du Baccalauréat
-          </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Calculez votre moyenne du bac ou découvrez les notes nécessaires pour atteindre votre objectif
+    <div className="min-h-screen bg-gray-50">
+      <PlatformHeader />
+      
+      <div className="bg-gradient-to-br from-blue-50 via-white to-purple-50 py-8">
+        <div className="container mx-auto px-4 max-w-6xl">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-bold text-gray-900 mb-2">
+              Simulateur de Notes du Baccalauréat
+            </h1>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Calculez votre moyenne du bac ou découvrez les notes nécessaires pour atteindre votre objectif
           </p>
         </div>
 
@@ -102,8 +103,8 @@ const Simulateur: React.FC = () => {
               onClick={() => setActiveTab('simulator')}
               className={`px-6 py-3 rounded-md font-medium transition-all ${
                 activeTab === 'simulator'
-                  ? 'bg-blue-600 text-white shadow-md'
-                  : 'text-gray-600 hover:text-blue-600'
+                  ? 'bg-[#cda86b] text-white shadow-md'
+                  : 'text-gray-600 hover:text-[#cda86b]'
               }`}
             >
               <Calculator className="w-4 h-4 inline mr-2" />
@@ -113,8 +114,8 @@ const Simulateur: React.FC = () => {
               onClick={() => setActiveTab('history')}
               className={`px-6 py-3 rounded-md font-medium transition-all ${
                 activeTab === 'history'
-                  ? 'bg-blue-600 text-white shadow-md'
-                  : 'text-gray-600 hover:text-blue-600'
+                  ? 'bg-[#cda86b] text-white shadow-md'
+                  : 'text-gray-600 hover:text-[#cda86b]'
               }`}
             >
               <TrendingUp className="w-4 h-4 inline mr-2" />
@@ -147,7 +148,7 @@ const Simulateur: React.FC = () => {
               {/* Informations sur le calcul */}
               <div className="bg-white rounded-xl shadow-lg p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                  <BookOpen className="w-5 h-5 mr-2 text-blue-600" />
+                  <BookOpen className="w-5 h-5 mr-2 text-[#cda86b]" />
                   Comment ça marche ?
                 </h3>
                 <div className="space-y-3 text-sm text-gray-600">
@@ -176,6 +177,7 @@ const Simulateur: React.FC = () => {
         ) : (
           <ScenarioHistory scenarios={scenarios} onLoadScenario={setNotes} />
         )}
+        </div>
       </div>
     </div>
   );

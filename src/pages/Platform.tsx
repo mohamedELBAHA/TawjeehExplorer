@@ -8,6 +8,7 @@ import { Range } from 'react-range';
 import type { LatLngExpression } from 'leaflet';
 import L from 'leaflet';
 import ChatbotWidget from '../components/ChatbotWidget';
+import PlatformHeader from '../components/PlatformHeader';
 import { Search, Filter, ChevronDown } from 'lucide-react';
 import { UserCircleIcon } from '@heroicons/react/24/outline';
 
@@ -171,291 +172,246 @@ const Platform: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-[#004235] shadow-lg border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center">
-              <h1 className="text-2xl font-bold text-white">Tawjeeh Navigator</h1>
+      <PlatformHeader 
+        showNotificationBanner={showMatcherNotification}
+        onDismissNotification={() => setShowMatcherNotification(false)}
+        customNotificationContent={
+          <div className="flex items-center space-x-3">
+            <div className="flex-shrink-0">
+              <svg className="w-6 h-6 text-white animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" strokeWidth={2}/>
+                <circle cx="12" cy="12" r="6" strokeWidth={2}/>
+                <circle cx="12" cy="12" r="2" strokeWidth={2}/>
+              </svg>
             </div>
-            <div className="flex items-center space-x-8">
-              <nav className="flex space-x-8">
-                <a href="/" className="text-gray-200 hover:text-[#cda86b] transition-colors">Accueil</a>
-                <a href="/platform" className="text-[#cda86b] font-medium">Plateforme</a>
-                <Link 
-                  to="/simulateur" 
-                  className="text-gray-200 hover:text-[#cda86b] transition-colors"
-                >
-                  Simulateur
-                </Link>
-                {user && (
-                  <Link 
-                    to="/profile" 
-                    className="flex items-center space-x-1 text-gray-200 hover:text-[#cda86b] transition-colors"
-                  >
-                    <UserCircleIcon className="h-5 w-5" />
-                    <span>Profile</span>
-                  </Link>
-                )}
-              </nav>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Matcher Suggestion Banner */}
-      {showMatcherNotification && (
-        <div className="bg-gradient-to-r from-[#004235] to-[#cda86b] text-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="flex-shrink-0">
-                  <svg className="w-6 h-6 text-white animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <circle cx="12" cy="12" r="10" strokeWidth={2}/>
-                    <circle cx="12" cy="12" r="6" strokeWidth={2}/>
-                    <circle cx="12" cy="12" r="2" strokeWidth={2}/>
-                  </svg>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium">
-                    🎯 <span className="font-bold">Astuce :</span> Pas envie de filtrer manuellement ? 
-                    <span className="ml-1 underline cursor-pointer hover:text-yellow-200 transition-colors"
-                          onClick={() => {
-                            // Click the floating matcher button
-                            const matcherButton = document.querySelector('[aria-label="Ouvrir l\'assistant d\'orientation"]') as HTMLButtonElement;
-                            if (matcherButton) {
-                              matcherButton.click();
-                            }
-                          }}>
-                      Utilisez notre assistant intelligent
-                    </span> 
-                    <span className="ml-1">pour trouver vos écoles idéales en quelques questions !</span>
-                  </p>
-                </div>
-              </div>
-              <div className="flex-shrink-0">
-                <button
-                  onClick={() => setShowMatcherNotification(false)}
-                  className="text-white hover:text-gray-200 transition-colors"
-                  aria-label="Fermer la notification"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium">
+                🎯 <span className="font-bold">Astuce :</span> Pas envie de filtrer manuellement ? 
+                <span className="ml-1 underline cursor-pointer hover:text-yellow-200 transition-colors"
+                      onClick={() => {
+                        // Click the floating matcher button
+                        const matcherButton = document.querySelector('[aria-label="Ouvrir l\'assistant d\'orientation"]') as HTMLButtonElement;
+                        if (matcherButton) {
+                          matcherButton.click();
+                        }
+                      }}>
+                  Utilisez notre assistant intelligent
+                </span> 
+                <span className="ml-1">pour trouver vos écoles idéales en quelques questions !</span>
+              </p>
             </div>
           </div>
-        </div>
-      )}
+        }
+      />
 
-      {/* Premium Filter Panel */}
-      <div className="bg-white border-b border-gray-200 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Main Filter Bar */}
-          <div className="py-4">
-            <div className="flex flex-wrap items-center gap-3">
-              {/* Core Essential Filters */}
-              <div className="flex items-center gap-3">
-                {/* Type de Bac - Most Important */}
-                <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">Type de Bac</label>
-                  <select 
-                    value={selectedBacType} 
-                    onChange={(e) => setSelectedBacType(e.target.value)}
-                    className="px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#004235] focus:border-[#004235] bg-white min-w-[180px] font-medium"
-                  >
-                    <option value="">Sélectionnez votre Bac</option>
-                    {uniqueBacTypes.map(bacType => (
-                      <option key={bacType} value={bacType}>
-                        {bacType.length > 30 ? bacType.substring(0, 30) + '...' : bacType}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Type d'établissement - Second Most Important */}
-                <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">Type d'établissement</label>
-                  <select 
-                    value={selectedInstitutionType} 
-                    onChange={(e) => setSelectedInstitutionType(e.target.value)}
-                    className="px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#004235] focus:border-[#004235] bg-white min-w-[160px] font-medium"
-                  >
-                    <option value="">Type d'établissement</option>
-                    {uniqueInstitutionTypes.map(type => (
-                      <option key={type} value={type}>{type}</option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Filiere Filter */}
-                <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">Filière</label>
-                  <select 
-                    value={selectedFiliere} 
-                    onChange={(e) => {
-                      setSelectedFiliere(e.target.value);
-                      if (e.target.value !== 'Ingénierie') {
-                        setSelectedSpecialty('');
-                      }
-                    }}
-                    className="px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#004235] focus:border-[#004235] bg-white min-w-[140px] font-medium"
-                  >
-                    <option value="">Toutes filières</option>
-                    {uniqueFilieres.map(filiere => (
-                      <option key={filiere} value={filiere}>{filiere}</option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* City Filter */}
-                <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">Ville</label>
-                  <select 
-                    value={selectedCity} 
-                    onChange={(e) => setSelectedCity(e.target.value)}
-                    className="px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#004235] focus:border-[#004235] bg-white min-w-[130px] font-medium"
-                  >
-                    <option value="">Toutes villes</option>
-                    {uniqueCities.map(city => (
-                      <option key={city} value={city}>{city}</option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Seuil Filter */}
-                <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">Seuil minimum</label>
-                  <div className="flex items-center bg-white border border-gray-300 rounded-lg px-3 py-2">
-                    <button
-                      onClick={() => setSeuilValue(Math.max(SEUIL_MIN, seuilValue - SEUIL_STEP))}
-                      disabled={seuilValue <= SEUIL_MIN}
-                      className="w-6 h-6 flex items-center justify-center bg-gray-100 hover:bg-gray-200 disabled:opacity-50 rounded-full transition-colors text-gray-600 text-xs font-bold"
-                    >
-                      −
-                    </button>
-                    <div className="mx-3 min-w-[2.5rem] text-center">
-                      <span className="text-sm font-bold text-[#004235]">{seuilValue}</span>
-                      <span className="text-xs text-gray-400">/20</span>
-                    </div>
-                    <button
-                      onClick={() => setSeuilValue(Math.min(SEUIL_MAX, seuilValue + SEUIL_STEP))}
-                      disabled={seuilValue >= SEUIL_MAX}
-                      className="w-6 h-6 flex items-center justify-center bg-gray-100 hover:bg-gray-200 disabled:opacity-50 rounded-full transition-colors text-gray-600 text-xs font-bold"
-                    >
-                      +
-                    </button>
-                  </div>
-                </div>
+      {/* Clean Filter Panel */}
+      <div className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          
+          {/* Primary Filters Row */}
+          <div className="mb-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+              {/* Type de Bac */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Type de Bac</label>
+                <select 
+                  value={selectedBacType} 
+                  onChange={(e) => setSelectedBacType(e.target.value)}
+                  className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#004235] focus:border-[#004235] bg-white font-medium shadow-sm"
+                >
+                  <option value="">Sélectionnez votre Bac</option>
+                  {uniqueBacTypes.map(bacType => (
+                    <option key={bacType} value={bacType}>
+                      {bacType.length > 30 ? bacType.substring(0, 30) + '...' : bacType}
+                    </option>
+                  ))}
+                </select>
               </div>
 
-              {/* Right Side Controls */}
-              <div className="flex items-center gap-3 ml-auto">
-                {/* Advanced Filters Toggle */}
-                <button
-                  onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-                  className={`px-4 py-2.5 text-sm rounded-lg border transition-all duration-200 flex items-center gap-2 ${
-                    showAdvancedFilters 
-                      ? 'bg-[#004235] text-white border-[#004235]' 
-                      : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                  }`}
+              {/* Type d'établissement */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Type d'établissement</label>
+                <select 
+                  value={selectedInstitutionType} 
+                  onChange={(e) => setSelectedInstitutionType(e.target.value)}
+                  className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#004235] focus:border-[#004235] bg-white font-medium shadow-sm"
                 >
-                  <Filter className="w-4 h-4" />
-                  <span>Plus de filtres</span>
-                  <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${showAdvancedFilters ? 'rotate-180' : ''}`} />
-                </button>
+                  <option value="">Tous types</option>
+                  {uniqueInstitutionTypes.map(type => (
+                    <option key={type} value={type}>{type}</option>
+                  ))}
+                </select>
+              </div>
 
-                {/* Results Counter */}
-                <div className="px-4 py-2.5 bg-gray-50 rounded-lg border border-gray-200">
-                  <span className="text-sm font-medium text-gray-700">
-                    {filteredSchools.length} école{filteredSchools.length !== 1 ? 's' : ''}
-                  </span>
-                </div>
+              {/* Filière */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Filière</label>
+                <select 
+                  value={selectedFiliere} 
+                  onChange={(e) => {
+                    setSelectedFiliere(e.target.value);
+                    if (e.target.value !== 'Ingénierie') {
+                      setSelectedSpecialty('');
+                    }
+                  }}
+                  className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#004235] focus:border-[#004235] bg-white font-medium shadow-sm"
+                >
+                  <option value="">Toutes filières</option>
+                  {uniqueFilieres.map(filiere => (
+                    <option key={filiere} value={filiere}>{filiere}</option>
+                  ))}
+                </select>
+              </div>
 
-                {/* Clear Filters */}
-                {(selectedFiliere || selectedCity || seuilValue > SEUIL_MIN || selectedBacType || selectedInstitutionType || selectedPublicPrivate || selectedConcoursType || selectedAdmissionType || selectedSpecialty) && (
+              {/* Ville */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Ville</label>
+                <select 
+                  value={selectedCity} 
+                  onChange={(e) => setSelectedCity(e.target.value)}
+                  className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#004235] focus:border-[#004235] bg-white font-medium shadow-sm"
+                >
+                  <option value="">Toutes villes</option>
+                  {uniqueCities.map(city => (
+                    <option key={city} value={city}>{city}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Seuil minimum */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Seuil minimum</label>
+                <div className="flex items-center bg-white border border-gray-300 rounded-lg px-3 py-2.5 shadow-sm">
                   <button
-                    onClick={clearAllFilters}
-                    className="px-3 py-2.5 text-sm text-gray-600 hover:text-gray-800 transition-colors"
+                    onClick={() => setSeuilValue(Math.max(SEUIL_MIN, seuilValue - SEUIL_STEP))}
+                    disabled={seuilValue <= SEUIL_MIN}
+                    className="w-7 h-7 flex items-center justify-center bg-gray-100 hover:bg-[#004235] hover:text-white disabled:opacity-50 disabled:hover:bg-gray-100 disabled:hover:text-gray-600 rounded-full transition-colors text-gray-600 text-sm font-bold"
                   >
-                    Effacer
+                    −
                   </button>
-                )}
+                  <div className="flex-1 mx-3 text-center">
+                    <span className="text-sm font-bold text-[#004235]">{seuilValue}</span>
+                    <span className="text-xs text-gray-500">/20</span>
+                  </div>
+                  <button
+                    onClick={() => setSeuilValue(Math.min(SEUIL_MAX, seuilValue + SEUIL_STEP))}
+                    disabled={seuilValue >= SEUIL_MAX}
+                    className="w-7 h-7 flex items-center justify-center bg-gray-100 hover:bg-[#004235] hover:text-white disabled:opacity-50 disabled:hover:bg-gray-100 disabled:hover:text-gray-600 rounded-full transition-colors text-gray-600 text-sm font-bold"
+                  >
+                    +
+                  </button>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Advanced Filters Panel */}
-          <div className={`overflow-hidden transition-all duration-300 ease-out ${
+          {/* Controls Row */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-center gap-4">
+              {/* Advanced Filters Toggle */}
+              <button
+                onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+                className={`px-4 py-2.5 text-sm rounded-lg border transition-all duration-200 flex items-center gap-2 ${
+                  showAdvancedFilters 
+                    ? 'bg-[#004235] text-white border-[#004235] shadow-md' 
+                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 shadow-sm'
+                }`}
+              >
+                <Filter className="w-4 h-4" />
+                <span>Plus de filtres</span>
+                <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${showAdvancedFilters ? 'rotate-180' : ''}`} />
+              </button>
+              
+              {/* Clear Filters */}
+              {(selectedFiliere || selectedCity || seuilValue > SEUIL_MIN || selectedBacType || selectedInstitutionType || selectedPublicPrivate || selectedConcoursType || selectedAdmissionType || selectedSpecialty) && (
+                <button
+                  onClick={clearAllFilters}
+                  className="px-4 py-2.5 text-sm text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors border border-transparent hover:border-red-200"
+                >
+                  Effacer tous les filtres
+                </button>
+              )}
+            </div>
+
+            {/* Results Counter */}
+            <div className="px-4 py-2.5 bg-gradient-to-r from-[#004235] to-[#cda86b] text-white rounded-lg shadow-sm">
+              <span className="text-sm font-medium">
+                {filteredSchools.length} école{filteredSchools.length !== 1 ? 's' : ''} trouvée{filteredSchools.length !== 1 ? 's' : ''}
+              </span>
+            </div>
+          </div>
+
+          {/* Advanced Filters Panel - Clean Slide Animation */}
+          <div className={`transition-all duration-300 ease-in-out overflow-hidden ${
             showAdvancedFilters ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
           }`}>
-            <div className="pb-4 border-t border-gray-100">
-              <div className="pt-4 space-y-4">
-                {/* Advanced Filters Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {/* Public/Private Filter */}
-                  <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-2">Secteur</label>
-                    <select 
-                      value={selectedPublicPrivate} 
-                      onChange={(e) => setSelectedPublicPrivate(e.target.value)}
-                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#004235] focus:border-[#004235] bg-white"
-                    >
-                      <option value="">Public et Privé</option>
-                      <option value="public">🏛️ Public uniquement</option>
-                      <option value="private">🏢 Privé uniquement</option>
-                    </select>
-                  </div>
+            <div className="mt-6 p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200 shadow-sm">              
+              {/* Advanced Filters Grid - Clean Layout */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {/* Public/Private Filter */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Secteur</label>
+                  <select 
+                    value={selectedPublicPrivate} 
+                    onChange={(e) => setSelectedPublicPrivate(e.target.value)}
+                    className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#004235] focus:border-[#004235] bg-white font-medium shadow-sm transition-all hover:border-[#004235]"
+                  >
+                    <option value="">Public et Privé</option>
+                    <option value="public">🏛️ Public uniquement</option>
+                    <option value="private">🏢 Privé uniquement</option>
+                  </select>
+                </div>
 
-                  {/* Concours Requirement Filter */}
-                  <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-2">Mode d'admission</label>
-                    <select 
-                      value={selectedConcoursType} 
-                      onChange={(e) => setSelectedConcoursType(e.target.value)}
-                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#004235] focus:border-[#004235] bg-white"
-                    >
-                      <option value="">Tous les modes</option>
-                      <option value="with-concours">📝 Avec concours</option>
-                      <option value="without-concours">✅ Sans concours</option>
-                    </select>
-                  </div>
+                {/* Concours Requirement Filter */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Mode d'admission</label>
+                  <select 
+                    value={selectedConcoursType} 
+                    onChange={(e) => setSelectedConcoursType(e.target.value)}
+                    className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#004235] focus:border-[#004235] bg-white font-medium shadow-sm transition-all hover:border-[#004235]"
+                  >
+                    <option value="">Tous les modes</option>
+                    <option value="with-concours">📝 Avec concours</option>
+                    <option value="without-concours">✅ Sans concours</option>
+                  </select>
+                </div>
 
-                  {/* Admission Type Filter */}
-                  <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-2">Type d'admission</label>
-                    <select 
-                      value={selectedAdmissionType} 
-                      onChange={(e) => setSelectedAdmissionType(e.target.value)}
-                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#004235] focus:border-[#004235] bg-white"
-                    >
-                      <option value="">Tous les types</option>
-                      <option value="Concours">🏆 Concours</option>
-                      <option value="Preselection">📋 Présélection</option>
-                      <option value="Combined">🔄 Mixte</option>
-                      <option value="Direct">⚡ Accès direct</option>
-                    </select>
-                  </div>
-
-                  {/* Specialty Filter - Only shown when Ingénierie is selected */}
-                  {selectedFiliere === 'Ingénierie' && (
-                    <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-2">Spécialité</label>
-                      <select 
-                        value={selectedSpecialty} 
-                        onChange={(e) => setSelectedSpecialty(e.target.value)}
-                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#004235] focus:border-[#004235] bg-white"
-                      >
-                        <option value="">Toutes les spécialités</option>
-                        {availableSpecialties.map(specialty => (
-                          <option key={specialty} value={specialty}>{specialty}</option>
-                        ))}
-                      </select>
-                    </div>
-                  )}
+                {/* Admission Type Filter */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Type d'admission</label>
+                  <select 
+                    value={selectedAdmissionType} 
+                    onChange={(e) => setSelectedAdmissionType(e.target.value)}
+                    className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#004235] focus:border-[#004235] bg-white font-medium shadow-sm transition-all hover:border-[#004235]"
+                  >
+                    <option value="">Tous les types</option>
+                    <option value="Concours">🏆 Concours</option>
+                    <option value="Preselection">📋 Présélection</option>
+                    <option value="Combined">🔄 Mixte</option>
+                    <option value="Direct">⚡ Accès direct</option>
+                  </select>
                 </div>
               </div>
+
+              {/* Specialty Filter - Special Section for Engineering */}
+              {selectedFiliere === 'Ingénierie' && (
+                <div className="mt-6 p-4 bg-white rounded-lg border border-gray-200 shadow-sm">
+                  <label className="block text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
+                    <span className="text-[#cda86b]">⚙️</span>
+                    Spécialité d'ingénierie
+                  </label>
+                  <select 
+                    value={selectedSpecialty} 
+                    onChange={(e) => setSelectedSpecialty(e.target.value)}
+                    className="w-full md:w-2/3 px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#004235] focus:border-[#004235] bg-white font-medium shadow-sm transition-all hover:border-[#004235]"
+                  >
+                    <option value="">Toutes les spécialités d'ingénierie</option>
+                    {availableSpecialties.map(specialty => (
+                      <option key={specialty} value={specialty}>{specialty}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
             </div>
           </div>
         </div>

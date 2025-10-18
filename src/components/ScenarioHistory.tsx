@@ -69,11 +69,11 @@ const ScenarioHistory: React.FC<ScenarioHistoryProps> = ({ scenarios, onLoadScen
               <div className="p-6">
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex items-center space-x-3">
-                    <div className={`p-2 rounded-lg ${scenario.type === 'calculate' ? 'bg-blue-100' : 'bg-purple-100'}`}>
+                    <div className={`p-2 rounded-lg ${scenario.type === 'calculate' ? 'bg-[#cda86b]/10' : 'bg-[#004235]/10'}`}>
                       {scenario.type === 'calculate' ? (
-                        <Calculator className="w-5 h-5 text-blue-600" />
+                        <Calculator className="w-5 h-5 text-[#cda86b]" />
                       ) : (
-                        <Target className="w-5 h-5 text-purple-600" />
+                        <Target className="w-5 h-5 text-[#004235]" />
                       )}
                     </div>
                     <div>
@@ -98,12 +98,12 @@ const ScenarioHistory: React.FC<ScenarioHistoryProps> = ({ scenarios, onLoadScen
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                  <div className="bg-blue-50 rounded-lg p-3">
-                    <div className="text-xs font-medium text-blue-600 mb-1">Examen Régional</div>
-                    <div className="text-lg font-bold text-blue-800">
+                  <div className="bg-[#cda86b]/10 rounded-lg p-3">
+                    <div className="text-xs font-medium text-[#004235] mb-1">Examen Régional</div>
+                    <div className="text-lg font-bold text-[#004235]">
                       {scenario.inputs.regional?.toFixed(2) || 'N/A'}/20
                     </div>
-                    <div className="text-xs text-blue-600">25% du total</div>
+                    <div className="text-xs text-[#004235]">25% du total</div>
                   </div>
 
                   <div className="bg-green-50 rounded-lg p-3">
@@ -114,19 +114,19 @@ const ScenarioHistory: React.FC<ScenarioHistoryProps> = ({ scenarios, onLoadScen
                     <div className="text-xs text-green-600">25% du total</div>
                   </div>
 
-                  <div className="bg-purple-50 rounded-lg p-3">
-                    <div className="text-xs font-medium text-purple-600 mb-1">Examen National</div>
-                    <div className="text-lg font-bold text-purple-800">
+                  <div className="bg-[#004235]/10 rounded-lg p-3">
+                    <div className="text-xs font-medium text-[#004235] mb-1">Examen National</div>
+                    <div className="text-lg font-bold text-[#004235]">
                       {scenario.inputs.national?.toFixed(2) || 'N/A'}/20
                     </div>
-                    <div className="text-xs text-purple-600">50% du total</div>
+                    <div className="text-xs text-[#004235]">50% du total</div>
                   </div>
                 </div>
 
                 <div className="flex justify-between items-center pt-4 border-t border-gray-100">
                   <button
                     onClick={() => onLoadScenario(scenario.inputs)}
-                    className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    className="flex items-center space-x-2 px-4 py-2 bg-[#cda86b] text-white rounded-lg hover:bg-[#b8956b] transition-colors"
                   >
                     <Calculator className="w-4 h-4" />
                     <span>Charger ce scénario</span>

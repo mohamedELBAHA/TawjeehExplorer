@@ -48,8 +48,8 @@ const SimulatorCard: React.FC<SimulatorCardProps> = ({
             onClick={() => onModeChange('calculate')}
             className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all ${
               mode === 'calculate'
-                ? 'bg-blue-600 text-white shadow-md'
-                : 'bg-white text-gray-600 hover:text-blue-600 shadow-sm'
+                ? 'bg-[#004235] text-white shadow-md'
+                : 'bg-white text-gray-600 hover:text-[#004235] shadow-sm'
             }`}
           >
             <Calculator className="w-4 h-4 inline mr-2" />
@@ -59,8 +59,8 @@ const SimulatorCard: React.FC<SimulatorCardProps> = ({
             onClick={() => onModeChange('reverse')}
             className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all ${
               mode === 'reverse'
-                ? 'bg-purple-600 text-white shadow-md'
-                : 'bg-white text-gray-600 hover:text-purple-600 shadow-sm'
+                ? 'bg-[#cda86b] text-white shadow-md'
+                : 'bg-white text-gray-600 hover:text-[#cda86b] shadow-sm'
             }`}
           >
             <Target className="w-4 h-4 inline mr-2" />
@@ -143,7 +143,7 @@ const SimulatorCard: React.FC<SimulatorCardProps> = ({
           <button
             onClick={onSave}
             disabled={notes.moyenne === null}
-            className="flex-1 py-3 px-4 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
+            className="flex-1 py-3 px-4 bg-[#cda86b] text-white rounded-lg font-medium hover:bg-[#b8956b] disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
           >
             <Save className="w-4 h-4 mr-2" />
             Sauvegarder
@@ -175,17 +175,17 @@ const InputField: React.FC<InputFieldProps> = ({
   optional = false
 }) => {
   const colorClasses = {
-    blue: 'border-blue-200 focus:border-blue-500 focus:ring-blue-200',
-    green: 'border-green-200 focus:border-green-500 focus:ring-green-200',
-    purple: 'border-purple-200 focus:border-purple-500 focus:ring-purple-200',
-    orange: 'border-orange-200 focus:border-orange-500 focus:ring-orange-200'
+    blue: 'border-blue-200 focus:border-[#cda86b] focus:ring-[#cda86b]/20',
+    green: 'border-green-200 focus:border-[#cda86b] focus:ring-[#cda86b]/20',
+    purple: 'border-purple-200 focus:border-[#004235] focus:ring-[#004235]/20',
+    orange: 'border-orange-200 focus:border-[#cda86b] focus:ring-[#cda86b]/20'
   };
 
   const badgeColors = {
     blue: 'bg-blue-100 text-blue-800',
     green: 'bg-green-100 text-green-800',
-    purple: 'bg-purple-100 text-purple-800',
-    orange: 'bg-orange-100 text-orange-800'
+    purple: 'bg-[#004235]/10 text-[#004235]',
+    orange: 'bg-[#cda86b]/10 text-[#004235]'
   };
 
   return (

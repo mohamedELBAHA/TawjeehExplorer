@@ -179,21 +179,12 @@ const LandingPage = () => {
                 
                 {user ? (
                   // Authenticated user navigation
-                  <>
-                    <button 
-                      onClick={() => navigate('/profile')}
-                      className="text-gray-700 hover:text-[#004235] px-3 py-2 text-sm font-medium transition-colors flex items-center space-x-1"
-                    >
-                      <span>👤</span>
-                      <span>{profile?.first_name || 'Profil'}</span>
-                    </button>
-                    <button 
-                      onClick={() => navigate('/platform')}
-                      className="bg-[#004235] text-white px-6 py-2 rounded-lg font-medium transition-all duration-300 hover:bg-[#cda86b] hover:text-white"
-                    >
-                      Plateforme
-                    </button>
-                  </>
+                  <button 
+                    onClick={() => navigate('/platform')}
+                    className="bg-[#004235] text-white px-6 py-2 rounded-lg font-medium transition-all duration-300 hover:bg-[#cda86b] hover:text-white"
+                  >
+                    Plateforme
+                  </button>
                 ) : (
                   // Non-authenticated user navigation
                   <>
@@ -242,21 +233,12 @@ const LandingPage = () => {
               
               {user ? (
                 // Authenticated user mobile navigation
-                <>
-                  <button 
-                    onClick={() => navigate('/profile')}
-                    className="block w-full text-left px-3 py-2 text-gray-700 hover:text-[#004235] font-medium flex items-center space-x-2"
-                  >
-                    <span>👤</span>
-                    <span>{profile?.first_name || 'Mon Profil'}</span>
-                  </button>
-                  <button 
-                    onClick={() => navigate('/platform')}
-                    className="block w-full mt-2 px-4 py-2 rounded-lg font-semibold transition-all duration-300 bg-[#004235] text-white hover:bg-[#cda86b] hover:text-white"
-                  >
-                    Plateforme
-                  </button>
-                </>
+                <button 
+                  onClick={() => navigate('/platform')}
+                  className="block w-full mt-2 px-4 py-2 rounded-lg font-semibold transition-all duration-300 bg-[#004235] text-white hover:bg-[#cda86b] hover:text-white"
+                >
+                  Plateforme
+                </button>
               ) : (
                 // Non-authenticated user mobile navigation
                 <>
