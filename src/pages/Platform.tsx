@@ -182,6 +182,12 @@ const Platform: React.FC = () => {
               <nav className="flex space-x-8">
                 <a href="/" className="text-gray-200 hover:text-[#cda86b] transition-colors">Accueil</a>
                 <a href="/platform" className="text-[#cda86b] font-medium">Plateforme</a>
+                <Link 
+                  to="/simulateur" 
+                  className="text-gray-200 hover:text-[#cda86b] transition-colors"
+                >
+                  Simulateur
+                </Link>
                 {user && (
                   <Link 
                     to="/profile" 

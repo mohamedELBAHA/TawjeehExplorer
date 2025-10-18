@@ -5,6 +5,7 @@ import Platform from './pages/Platform';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Profile from './pages/Profile';
+import Simulateur from './pages/Simulateur';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import FullPageLoader from './components/FullPageLoader';
@@ -23,6 +24,7 @@ function AppContent() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/simulateur" element={<Simulateur />} />
         
         {/* Protected routes */}
         <Route

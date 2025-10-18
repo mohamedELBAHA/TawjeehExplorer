@@ -92,9 +92,26 @@ public
 # Vite build output
 dist/
 dist-ssr/
+.vite/
 
 # Rollup cache
 .rollup.cache/
+
+# Package lock files (keep only one based on your package manager)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+*.temp
 
 # Serverless directories
 .serverless/
