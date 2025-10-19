@@ -187,7 +187,7 @@ const StudentMatcher: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     const currentDate = new Date().toLocaleDateString('fr-FR');
     
     let reportContent = `RAPPORT D'ORIENTATION PERSONNALISÉ
-Tawjeeh Explorer - ${currentDate}
+Afaqi - ${currentDate}
 
 ====================================
 PROFIL ÉTUDIANT
@@ -286,9 +286,9 @@ CONSEILS ET PROCHAINES ÉTAPES
 5. Visitez les campus si possible
 
 Pour plus d'informations, consultez notre plateforme:
-https://tawjeeh-explorer.com
+https://afaqi.com
 
-Rapport généré automatiquement par Tawjeeh Explorer
+Rapport généré automatiquement par Afaqi
 © 2025 - Assistant d'orientation intelligent pour étudiants marocains
 `;
 

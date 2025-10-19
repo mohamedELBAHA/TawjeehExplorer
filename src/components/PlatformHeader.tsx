@@ -55,7 +55,7 @@ const PlatformHeader: React.FC<PlatformHeaderProps> = ({
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center">
               <Link to="/" className="text-2xl font-bold text-white hover:text-[#cda86b] transition-colors">
-                Tawjeeh Navigator
+                Afaqi
               </Link>
             </div>
             <div className="flex items-center space-x-8">

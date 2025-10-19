@@ -22,4 +22,4 @@ app.post('/chat', async (req, res) => {
   }
 });
 
-app.listen(5000, () => console.log("Tawjeeh Explorer API running on port 5000"));
+app.listen(5000, () => console.log("Afaqi API running on port 5000"));

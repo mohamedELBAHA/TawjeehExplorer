@@ -110,22 +110,20 @@ const SimulatorCard: React.FC<SimulatorCardProps> = ({
                 isValid={isValidNote(notes.moyenne)}
               />
               <InputField
-                label="Note Examen Régional (acquise)"
+                label="Note Examen Régional"
                 value={notes.regional}
                 onChange={(value) => handleInputChange('regional', value)}
                 color="blue"
                 weight="25%"
                 isValid={isValidNote(notes.regional)}
-                optional
               />
               <InputField
-                label="Note Contrôles Continus (acquise)"
+                label="Note Contrôles Continus"
                 value={notes.controleContinue}
                 onChange={(value) => handleInputChange('controleContinue', value)}
                 color="green"
                 weight="25%"
                 isValid={isValidNote(notes.controleContinue)}
-                optional
               />
             </>
           )}

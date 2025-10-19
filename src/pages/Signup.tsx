@@ -216,7 +216,7 @@ export default function Signup() {
       <div className="max-w-md w-full bg-white rounded-lg shadow-xl p-6">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-800 mb-2">Créer un compte</h1>
-          <p className="text-gray-600">Rejoignez TawjeehExplorer pour découvrir votre parcours</p>
+          <p className="text-gray-600">Rejoignez Afaqi pour découvrir votre parcours</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">

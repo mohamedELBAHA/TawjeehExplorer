@@ -165,22 +165,6 @@ const Simulateur: React.FC = () => {
                         </p>
                       </div>
                     </div>
-                    
-                    {/* Weights */}
-                    <div className="flex space-x-6">
-                      <div className="text-center">
-                        <div className="text-xl font-bold text-gray-800">25%</div>
-                        <div className="text-xs text-gray-600">Régional</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-xl font-bold text-gray-800">25%</div>
-                        <div className="text-xs text-gray-600">Contrôle</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-xl font-bold text-gray-800">50%</div>
-                        <div className="text-xs text-gray-600">National</div>
-                      </div>
-                    </div>
                   </div>
                 </div>
               </div>

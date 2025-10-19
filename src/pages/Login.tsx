@@ -228,7 +228,7 @@ export default function Login() {
           <div className="text-center mb-8">
             {/* Logo/Brand */}
             <div className="mb-6">
-              <h1 className="text-3xl font-bold text-white mb-2">Tawjeeh Navigator</h1>
+              <h1 className="text-3xl font-bold text-white mb-2">Afaqi</h1>
               <div className="w-12 h-1 bg-gradient-to-r from-white/60 to-[#cda86b] mx-auto rounded-full"></div>
             </div>
             <p className="text-white/70">

@@ -177,7 +177,7 @@ const LandingPage = () => {
             <div className="flex items-center">
               <div className="flex-shrink-0 flex flex-col items-start">
                 <span className="text-2xl font-bold text-[#004235]">
-                  Tawjeeh Navigator
+                  Afaqi
                 </span>
                 <span className="mt-1 text-xs italic text-gray-500">powered by Tawjeeh</span>
               </div>
@@ -427,7 +427,7 @@ const LandingPage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Pourquoi choisir <span className="bg-gradient-to-r from-[#004235] to-[#cda86b] bg-clip-text text-transparent">Tawjeeh Explorer</span> ?
+              Pourquoi choisir <span className="bg-gradient-to-r from-[#004235] to-[#cda86b] bg-clip-text text-transparent">Afaqi</span> ?
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Une plateforme complète qui révolutionne la recherche d'établissements d'enseignement au Maroc
@@ -463,16 +463,14 @@ const LandingPage = () => {
                 L'avenir de l'orientation étudiante au Maroc
               </h2>
               <p className="text-lg text-gray-600 leading-relaxed">
-                Tawjeeh Explorer est né de la volonté de démocratiser l'accès à l'information sur l'enseignement supérieur marocain. Notre plateforme centralise toutes les données essentielles pour aider les étudiants et leurs familles à prendre des décisions éclairées.
+                Afaqi est né de la volonté de démocratiser l'accès à l'information sur l'enseignement supérieur marocain. Notre plateforme centralise toutes les données essentielles pour aider les étudiants et leurs familles à prendre des décisions éclairées.
               </p>
               
               <div className="space-y-4">
                 {[
                   "Base de données exhaustive mise à jour en temps réel",
                   "Interface intuitive adaptée à tous les profils",
-                  "Algorithmes de recommandation personnalisés",
-                  "Support multilingue (Arabe, Français, Anglais)"
-                ].map((item, index) => (
+                  "Algorithmes de recommandation personnalisés"                ].map((item, index) => (
                   <div key={index} className="flex items-center">
                     <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
                     <span className="text-gray-700">{item}</span>
@@ -559,7 +557,7 @@ const LandingPage = () => {
               Ce que disent nos utilisateurs
             </h2>
             <p className="text-xl text-[#cda86b] max-w-3xl mx-auto">
-              Découvrez les témoignages de ceux qui ont trouvé leur voie grâce à Tawjeeh Explorer
+              Découvrez les témoignages de ceux qui ont trouvé leur voie grâce à Afaqi
             </p>
           </div>
 
@@ -638,7 +636,7 @@ const LandingPage = () => {
             Prêt à découvrir votre future école ?
           </h2>
           <p className="text-xl text-[#cda86b] mb-8">
-            Rejoignez des milliers d'étudiants qui ont déjà trouvé leur voie avec Tawjeeh
+            Rejoignez des milliers d'étudiants qui ont déjà trouvé leur voie avec Afaqi
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button 
@@ -658,7 +656,7 @@ const LandingPage = () => {
       <footer className="bg-[#004235]">
         <div className="max-w-7xl mx-auto px-4 py-8 text-center">
           <p className="text-white text-sm font-medium">
-            © 2025 Tawjeeh Explorer. Tous droits réservés.
+            © 2025 Afaqi - A product of Tawjeeh Consulting. Tous droits réservés.
           </p>
         </div>
       </footer>
