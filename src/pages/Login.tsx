@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -15,8 +15,9 @@ interface FormErrors {
 }
 
 export default function Login() {
-  const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const { user, loading } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   
@@ -26,6 +27,15 @@ export default function Login() {
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
+
+  // Check for loading parameter on mount
+  useEffect(() => {
+    const urlParams = new URLSearchParams(location.search);
+    if (urlParams.get('showLoading') === 'true' && user) {
+      // User is already logged in and came from home page, redirect to platform
+      navigate('/platform', { replace: true });
+    }
+  }, [user, location.search, navigate]);
 
   // Redirect if already logged in
   if (!loading && user) {
@@ -105,8 +115,17 @@ export default function Login() {
           newValue: JSON.stringify(adminUser)
         }));
         
-        // Redirect to platform
-        navigate('/platform', { replace: true });
+        // Check if user came from home page wanting to access platform
+        const from = (location.state as any)?.from?.pathname;
+        const shouldShowLoading = from === '/' || location.pathname === '/login';
+        
+        if (shouldShowLoading) {
+          // Redirect to home with loading parameter
+          navigate('/?showLoading=true', { replace: true });
+        } else {
+          // Direct access to platform
+          navigate('/platform', { replace: true });
+        }
         return;
       }
 
@@ -134,8 +153,17 @@ export default function Login() {
       }
 
       if (data.user) {
-        // Successful login - redirect to platform
-        navigate('/platform', { replace: true });
+        // Check if user came from home page wanting to access platform
+        const from = (location.state as any)?.from?.pathname;
+        const shouldShowLoading = from === '/' || location.pathname === '/login';
+        
+        if (shouldShowLoading) {
+          // Redirect to home with loading parameter
+          navigate('/?showLoading=true', { replace: true });
+        } else {
+          // Direct access to platform
+          navigate('/platform', { replace: true });
+        }
       }
     } catch (err: any) {
       console.error('Login error:', err);

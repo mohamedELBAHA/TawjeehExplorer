@@ -27,6 +27,15 @@ export default {
       fontFamily: {
         sans: ['Space Grotesk', 'system-ui', 'sans-serif'],
       },
+      animation: {
+        'slide-left': 'slide-left 20s linear infinite',
+      },
+      keyframes: {
+        'slide-left': {
+          '0%': { transform: 'translateX(0)' },
+          '100%': { transform: 'translateX(-33.333%)' },
+        },
+      },
     },
   },
   plugins: [],

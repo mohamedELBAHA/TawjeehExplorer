@@ -129,7 +129,26 @@ const LandingPage = () => {
     return () => clearInterval(interval);
   }, []);
 
+  // Check for loading parameter after login
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('showLoading') === 'true' && user) {
+      // Remove the parameter from URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+      // Start loading screen
+      startLoading();
+    }
+  }, [user]);
+
   const startLoading = () => {
+    // Check if user is authenticated first
+    if (!user) {
+      // If not authenticated, go to login page first
+      navigate('/login');
+      return;
+    }
+    
+    // If authenticated, show loading screen then navigate to platform
     setIsLoading(true);
     setLoadingPercent(0);
     let percent = 0;
@@ -180,7 +199,7 @@ const LandingPage = () => {
                 {user ? (
                   // Authenticated user navigation
                   <button 
-                    onClick={() => navigate('/platform')}
+                    onClick={startLoading}
                     className="bg-[#004235] text-white px-6 py-2 rounded-lg font-medium transition-all duration-300 hover:bg-[#cda86b] hover:text-white"
                   >
                     Plateforme
@@ -234,7 +253,7 @@ const LandingPage = () => {
               {user ? (
                 // Authenticated user mobile navigation
                 <button 
-                  onClick={() => navigate('/platform')}
+                  onClick={startLoading}
                   className="block w-full mt-2 px-4 py-2 rounded-lg font-semibold transition-all duration-300 bg-[#004235] text-white hover:bg-[#cda86b] hover:text-white"
                 >
                   Plateforme
@@ -305,35 +324,6 @@ const LandingPage = () => {
                     <span>Explorer la carte</span>
                     <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                   </button>
-                  <button className="group bg-white text-[#004235] px-8 py-4 rounded-xl font-semibold border-2 border-[#004235] hover:bg-[#cda86b] hover:text-white transition-all duration-300 flex items-center justify-center">
-                    <Play className="mr-2 w-5 h-5" />
-                    <span>Voir la démo</span>
-                  </button>
-                </div>
-
-                {/* Quick stats */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 pt-8">
-                  {stats.map((stat, index) => {
-                    const Icon = stat.icon;
-                    return (
-                      <div
-                        key={index}
-                        className={`text-center transform transition-all duration-500 ${
-                          currentStat === index ? 'scale-110' : 'scale-100'
-                        }`}
-                      >
-                        <div className={`w-12 h-12 mx-auto mb-2 rounded-xl flex items-center justify-center ${
-                          currentStat === index 
-                            ? 'bg-[#cda86b] text-white' 
-                            : 'bg-gray-100 text-gray-600'
-                        }`}>
-                          <Icon className="w-6 h-6" />
-                        </div>
-                        <div className="text-2xl font-bold text-gray-900">{stat.number}</div>
-                        <div className="text-sm text-gray-600">{stat.label}</div>
-                      </div>
-                    );
-                  })}
                 </div>
               </div>
 
@@ -408,6 +398,30 @@ const LandingPage = () => {
         </div>
       </section>
 
+      {/* Statistics Section */}
+      <section className="-mt-10 pt-0 pb-16 bg-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 text-center">
+            <div className="space-y-2">
+              <div className="text-4xl font-bold text-[#004235]">100+</div>
+              <div className="text-lg font-medium text-gray-600">Établissements</div>
+            </div>
+            <div className="space-y-2">
+              <div className="text-4xl font-bold text-[#004235]">12k+</div>
+              <div className="text-lg font-medium text-gray-600">Étudiants</div>
+            </div>
+            <div className="space-y-2">
+              <div className="text-4xl font-bold text-[#004235]">12</div>
+              <div className="text-lg font-medium text-gray-600">Villes</div>
+            </div>
+            <div className="space-y-2">
+              <div className="text-4xl font-bold text-[#004235]">98%</div>
+              <div className="text-lg font-medium text-gray-600">Satisfaction</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Features Section */}
       <section id="features" className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -467,7 +481,7 @@ const LandingPage = () => {
               </div>
 
               <button 
-                onClick={() => navigate('/platform')}
+                onClick={startLoading}
                 className="bg-[#004235] text-white px-8 py-3 rounded-xl font-semibold hover:bg-[#cda86b] hover:text-white transition-all duration-300"
               >
                 En savoir plus
@@ -538,7 +552,7 @@ const LandingPage = () => {
 
 
       {/* Testimonials Section */}
-      <section id="testimonials" className="py-20 bg-gradient-to-br from-[#004235] to-[#cda86b]">
+      <section id="testimonials" className="py-20 bg-gradient-to-br from-[#004235] to-[#cda86b] overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-white mb-4">
@@ -549,26 +563,70 @@ const LandingPage = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <div
-                key={index}
-                className="bg-white/10 backdrop-blur-sm p-6 rounded-xl border border-white/20 hover:bg-white/20 transition-all duration-300"
-              >
-                <p className="text-white leading-relaxed mb-6">"{testimonial.content}"</p>
-                <div className="flex items-center">
-                  <img
-                    src={testimonial.image}
-                    alt={testimonial.name}
-                    className="w-12 h-12 rounded-full mr-4"
-                  />
-                  <div>
-                    <div className="font-semibold text-white">{testimonial.name}</div>
-                    <div className="text-blue-100 text-sm">{testimonial.role}</div>
+          {/* Sliding Container */}
+          <div className="relative">
+            <div className="flex animate-slide-left">
+              {/* First set of testimonials */}
+              {testimonials.map((testimonial, index) => (
+                <div
+                  key={`first-${index}`}
+                  className="flex-shrink-0 w-80 mx-4 bg-white/10 backdrop-blur-sm p-6 rounded-xl border border-white/20 hover:bg-white/20 transition-all duration-300"
+                >
+                  <p className="text-white leading-relaxed mb-6">"{testimonial.content}"</p>
+                  <div className="flex items-center">
+                    <img
+                      src={testimonial.image}
+                      alt={testimonial.name}
+                      className="w-12 h-12 rounded-full mr-4"
+                    />
+                    <div>
+                      <div className="font-semibold text-white">{testimonial.name}</div>
+                      <div className="text-blue-100 text-sm">{testimonial.role}</div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+              {/* Second set of testimonials (for seamless loop) */}
+              {testimonials.map((testimonial, index) => (
+                <div
+                  key={`second-${index}`}
+                  className="flex-shrink-0 w-80 mx-4 bg-white/10 backdrop-blur-sm p-6 rounded-xl border border-white/20 hover:bg-white/20 transition-all duration-300"
+                >
+                  <p className="text-white leading-relaxed mb-6">"{testimonial.content}"</p>
+                  <div className="flex items-center">
+                    <img
+                      src={testimonial.image}
+                      alt={testimonial.name}
+                      className="w-12 h-12 rounded-full mr-4"
+                    />
+                    <div>
+                      <div className="font-semibold text-white">{testimonial.name}</div>
+                      <div className="text-blue-100 text-sm">{testimonial.role}</div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              {/* Third set of testimonials (for extra smoothness) */}
+              {testimonials.map((testimonial, index) => (
+                <div
+                  key={`third-${index}`}
+                  className="flex-shrink-0 w-80 mx-4 bg-white/10 backdrop-blur-sm p-6 rounded-xl border border-white/20 hover:bg-white/20 transition-all duration-300"
+                >
+                  <p className="text-white leading-relaxed mb-6">"{testimonial.content}"</p>
+                  <div className="flex items-center">
+                    <img
+                      src={testimonial.image}
+                      alt={testimonial.name}
+                      className="w-12 h-12 rounded-full mr-4"
+                    />
+                    <div>
+                      <div className="font-semibold text-white">{testimonial.name}</div>
+                      <div className="text-blue-100 text-sm">{testimonial.role}</div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -600,7 +658,7 @@ const LandingPage = () => {
       <footer className="bg-[#004235]">
         <div className="max-w-7xl mx-auto px-4 py-8 text-center">
           <p className="text-white text-sm font-medium">
-            © 2024 Tawjeeh Explorer. Tous droits réservés.
+            © 2025 Tawjeeh Explorer. Tous droits réservés.
           </p>
         </div>
       </footer>
