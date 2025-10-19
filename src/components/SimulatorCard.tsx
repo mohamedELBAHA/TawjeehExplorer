@@ -70,7 +70,7 @@ const SimulatorCard: React.FC<SimulatorCardProps> = ({
       </div>
 
       <div className="p-6">
-        <div className="grid gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Inputs selon le mode */}
           {mode === 'calculate' ? (
             <>
@@ -189,16 +189,23 @@ const InputField: React.FC<InputFieldProps> = ({
   };
 
   return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between">
-        <label className="block text-sm font-medium text-gray-700">
-          {label}
-          {optional && <span className="text-gray-400 ml-1">(optionnel)</span>}
-        </label>
-        <span className={`px-2 py-1 rounded-full text-xs font-medium ${badgeColors[color as keyof typeof badgeColors]}`}>
+    <div className="space-y-3">
+      {/* Badge centered at top */}
+      <div className="text-center">
+        <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${badgeColors[color as keyof typeof badgeColors]}`}>
           {weight}
         </span>
       </div>
+      
+      {/* Label */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 text-center mb-3">
+          {label}
+          {optional && <span className="text-gray-400 ml-1">(optionnel)</span>}
+        </label>
+      </div>
+      
+      {/* Input */}
       <div className="relative">
         <input
           type="number"
@@ -208,18 +215,20 @@ const InputField: React.FC<InputFieldProps> = ({
           value={value || ''}
           onChange={(e) => onChange(e.target.value)}
           placeholder="0.00"
-          className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 transition-colors text-lg font-medium
+          className={`w-full px-4 py-4 border-2 rounded-lg focus:outline-none focus:ring-2 transition-colors text-xl font-bold text-center
             ${isValid 
               ? colorClasses[color as keyof typeof colorClasses]
               : 'border-red-300 focus:border-red-500 focus:ring-red-200'
             }`}
         />
-        <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 font-medium">
+        <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 font-medium text-sm">
           /20
         </div>
       </div>
+      
+      {/* Error message */}
       {value !== null && !isValid && (
-        <p className="text-red-500 text-xs mt-1">La note doit être entre 0 et 20</p>
+        <p className="text-red-500 text-xs text-center mt-2">La note doit être entre 0 et 20</p>
       )}
     </div>
   );

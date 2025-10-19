@@ -33,89 +33,118 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ notes, mode }) => {
   const requiredNational = getRequiredNational();
 
   return (
-    <div className="space-y-6">
-      {/* Résultat Principal */}
-      <div className="bg-white rounded-xl shadow-lg p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-          <Trophy className="w-5 h-5 mr-2 text-yellow-500" />
-          Résultat
-        </h3>
+    <div className="h-full">
+      <div className="bg-white rounded-xl shadow-lg h-full flex flex-col">
+        {/* Header */}
+        <div className="p-6 border-b border-gray-100">
+          <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+            <Trophy className="w-5 h-5 mr-2 text-yellow-500" />
+            Résultat
+          </h3>
+        </div>
 
-        {mode === 'calculate' && notes.moyenne !== null && (
-          <div className="text-center">
-            <div className="text-5xl font-bold text-gray-900 mb-2">
-              {notes.moyenne.toFixed(2)}
-              <span className="text-2xl text-gray-500">/20</span>
-            </div>
-            {(() => {
-              const mention = getMention(notes.moyenne);
-              return (
-                <div className={`inline-flex items-center px-4 py-2 rounded-full ${mention.bg} ${mention.color} font-medium`}>
-                  <CheckCircle className="w-4 h-4 mr-2" />
-                  {mention.label}
+        {/* Main Content */}
+        <div className="flex-1 p-6 flex flex-col justify-center">
+          {mode === 'calculate' && notes.moyenne !== null && (
+            <div className="text-center space-y-6">
+              <div>
+                <div className="text-6xl font-bold text-gray-900 mb-3">
+                  {notes.moyenne.toFixed(2)}
+                  <span className="text-3xl text-gray-500">/20</span>
                 </div>
-              );
-            })()}
-          </div>
-        )}
-
-        {mode === 'reverse' && requiredNational !== null && (
-          <div className="text-center">
-            <p className="text-gray-600 mb-3">
-              Pour obtenir <strong>{notes.moyenne}/20</strong>, vous devez avoir :
-            </p>
-            <div className="text-4xl font-bold mb-2">
-              <span className={requiredNational <= 20 ? 'text-green-600' : 'text-red-600'}>
-                {requiredNational.toFixed(2)}
-              </span>
-              <span className="text-xl text-gray-500">/20</span>
-            </div>
-            <p className="text-sm text-gray-600">à l'examen national</p>
-            
-            {requiredNational > 20 && (
-              <div className="mt-4 p-3 bg-red-50 rounded-lg">
-                <div className="flex items-center text-red-600">
-                  <AlertCircle className="w-4 h-4 mr-2" />
-                  <span className="text-sm font-medium">
-                    Objectif impossible à atteindre avec ces notes
-                  </span>
-                </div>
+                {(() => {
+                  const mention = getMention(notes.moyenne);
+                  return (
+                    <div className={`inline-flex items-center px-6 py-3 rounded-full ${mention.bg} ${mention.color} font-semibold text-lg`}>
+                      <CheckCircle className="w-5 h-5 mr-2" />
+                      {mention.label}
+                    </div>
+                  );
+                })()}
               </div>
-            )}
-          </div>
-        )}
 
-        {notes.moyenne === null && (
-          <div className="text-center text-gray-500 py-8">
-            <TrendingUp className="w-12 h-12 mx-auto mb-3 opacity-50" />
-            <p>Entrez vos notes pour voir le résultat</p>
+
+            </div>
+          )}
+
+          {mode === 'reverse' && requiredNational !== null && (
+            <div className="text-center space-y-6">
+              <div>
+                <p className="text-gray-600 mb-4 text-lg">
+                  Pour obtenir <strong>{notes.moyenne}/20</strong>, vous devez avoir :
+                </p>
+                <div className="text-5xl font-bold mb-3">
+                  <span className={requiredNational <= 20 ? 'text-green-600' : 'text-red-600'}>
+                    {requiredNational.toFixed(2)}
+                  </span>
+                  <span className="text-2xl text-gray-500">/20</span>
+                </div>
+                <p className="text-gray-600 text-lg">à l'examen national</p>
+              </div>
+              
+              {requiredNational > 20 && (
+                <div className="p-4 bg-red-50 rounded-lg">
+                  <div className="flex items-center justify-center text-red-600">
+                    <AlertCircle className="w-5 h-5 mr-2" />
+                    <span className="font-medium">
+                      Objectif impossible à atteindre avec ces notes
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {requiredNational <= 20 && (
+                <div className="bg-green-50 rounded-lg p-4">
+                  <h4 className="font-semibold text-green-800 mb-2">Objectif réalisable !</h4>
+                  <p className="text-green-700 text-sm">
+                    Cette note à l'examen national vous permettra d'atteindre votre objectif.
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {notes.moyenne === null && (
+            <div className="text-center text-gray-500 py-12">
+              <TrendingUp className="w-16 h-16 mx-auto mb-4 opacity-50" />
+              <p className="text-lg">Entrez vos notes pour voir le résultat</p>
+              <p className="text-sm mt-2">Le calcul se fera automatiquement</p>
+            </div>
+          )}
+        </div>
+
+        {/* Progress Bar at Bottom */}
+        {notes.moyenne !== null && (
+          <div className="p-6 border-t border-gray-100">
+            <h4 className="font-semibold text-gray-900 mb-4 text-center">Progression sur l'échelle</h4>
+            <div className="space-y-3">
+              <div className="flex justify-between text-sm text-gray-600 font-medium">
+                <span>0</span>
+                <span>10 (Passable)</span>
+                <span>20</span>
+              </div>
+              <div className="relative w-full bg-gray-200 rounded-full h-4">
+                <div
+                  className="absolute top-0 left-0 h-4 rounded-full bg-gradient-to-r from-red-400 via-yellow-400 to-green-400 transition-all duration-500"
+                  style={{ width: `${Math.min((notes.moyenne / 20) * 100, 100)}%` }}
+                />
+                <div
+                  className="absolute top-0 w-0.5 h-4 bg-gray-700 opacity-50"
+                  style={{ left: '50%' }}
+                />
+                {/* Marker for current score */}
+                <div
+                  className="absolute -top-1 w-2 h-6 bg-[#004235] rounded-sm transform -translate-x-1/2"
+                  style={{ left: `${Math.min((notes.moyenne / 20) * 100, 100)}%` }}
+                />
+              </div>
+              <div className="text-center text-xs text-gray-500 mt-2">
+                Votre position: {notes.moyenne.toFixed(1)}/20
+              </div>
+            </div>
           </div>
         )}
       </div>
-
-      {/* Progression visuelle */}
-      {notes.moyenne !== null && (
-        <div className="bg-white rounded-xl shadow-lg p-6">
-          <h4 className="font-semibold text-gray-900 mb-4">Progression</h4>
-          <div className="space-y-3">
-            <div className="flex justify-between text-sm text-gray-600">
-              <span>0</span>
-              <span>10</span>
-              <span>20</span>
-            </div>
-            <div className="relative w-full bg-gray-200 rounded-full h-3">
-              <div
-                className="absolute top-0 left-0 h-3 rounded-full bg-gradient-to-r from-red-400 via-yellow-400 to-green-400"
-                style={{ width: `${Math.min((notes.moyenne / 20) * 100, 100)}%` }}
-              />
-              <div
-                className="absolute top-0 w-1 h-3 bg-gray-700"
-                style={{ left: '50%' }}
-              />
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

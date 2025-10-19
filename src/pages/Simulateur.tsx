@@ -125,55 +125,67 @@ const Simulateur: React.FC = () => {
         </div>
 
         {activeTab === 'simulator' ? (
-          <div className="grid lg:grid-cols-3 gap-8">
-            {/* Simulateur Principal */}
-            <div className="lg:col-span-2">
-              <SimulatorCard
-                notes={notes}
-                mode={mode}
-                onNotesChange={setNotes}
-                onModeChange={setMode}
-                onReset={resetCalculator}
-                onSave={handleSaveScenario}
-              />
+          <>
+            <div className="grid lg:grid-cols-3 gap-8 mb-8">
+              {/* Simulateur Principal */}
+              <div className="lg:col-span-2">
+                <SimulatorCard
+                  notes={notes}
+                  mode={mode}
+                  onNotesChange={setNotes}
+                  onModeChange={setMode}
+                  onReset={resetCalculator}
+                  onSave={handleSaveScenario}
+                />
+              </div>
+
+              {/* Résultats - Full Width */}
+              <div className="lg:col-span-1">
+                <ResultsDisplay
+                  notes={notes}
+                  mode={mode}
+                />
+              </div>
             </div>
 
-            {/* Résultats et Informations */}
-            <div className="space-y-6">
-              <ResultsDisplay
-                notes={notes}
-                mode={mode}
-              />
-              
-              {/* Informations sur le calcul */}
-              <div className="bg-white rounded-xl shadow-lg p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                  <BookOpen className="w-5 h-5 mr-2 text-[#cda86b]" />
-                  Comment ça marche ?
-                </h3>
-                <div className="space-y-3 text-sm text-gray-600">
-                  <div className="flex justify-between">
-                    <span>Examen Régional:</span>
-                    <span className="font-medium">25%</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Contrôles Continus:</span>
-                    <span className="font-medium">25%</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Examen National:</span>
-                    <span className="font-medium">50%</span>
-                  </div>
-                  <div className="border-t pt-3 mt-3">
-                    <div className="bg-blue-50 rounded-lg p-3">
-                      <strong>Formule:</strong><br />
-                      Moyenne = (Régional × 0.25) + (Contrôle × 0.25) + (National × 0.50)
+            {/* Comment ça marche - Minimalistic & Full Width */}
+            <div className="w-full">
+              <div className="py-8 px-6">
+                <div className="max-w-6xl mx-auto">
+                  <h3 className="text-lg font-semibold text-gray-700 text-center mb-6">
+                    Comment ça marche ?
+                  </h3>
+                  
+                  <div className="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-8">
+                    {/* Formula */}
+                    <div className="text-center md:text-left">
+                      <div className="bg-gray-100 rounded-lg px-6 py-4">
+                        <p className="text-gray-700 text-sm font-medium">
+                          Moyenne = Régional × 25% + Contrôle × 25% + National × 50%
+                        </p>
+                      </div>
+                    </div>
+                    
+                    {/* Weights */}
+                    <div className="flex space-x-6">
+                      <div className="text-center">
+                        <div className="text-xl font-bold text-gray-800">25%</div>
+                        <div className="text-xs text-gray-600">Régional</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-xl font-bold text-gray-800">25%</div>
+                        <div className="text-xs text-gray-600">Contrôle</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-xl font-bold text-gray-800">50%</div>
+                        <div className="text-xs text-gray-600">National</div>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
+          </>
         ) : (
           <ScenarioHistory scenarios={scenarios} onLoadScenario={setNotes} />
         )}

@@ -9,11 +9,12 @@ import {
   GraduationCap, 
   Edit2,
   Save,
-  X
+  X,
+  LogOut
 } from 'lucide-react';
 
 export default function Profile() {
-  const { user, profile } = useAuth();
+  const { user, profile, logout } = useAuth();
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [editedProfile, setEditedProfile] = useState({
@@ -37,6 +38,15 @@ export default function Profile() {
       class_level: profile?.class_level || ''
     });
     setIsEditing(false);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/');
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
   };
 
   return (
@@ -232,7 +242,7 @@ export default function Profile() {
         </div>
 
         {/* Quick Links */}
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
           <button
             onClick={() => navigate('/simulateur')}
             className="p-4 bg-white rounded-lg shadow-sm border border-gray-200 hover:border-[#004235] transition-colors text-left"
@@ -247,6 +257,17 @@ export default function Profile() {
           >
             <h3 className="font-semibold text-gray-900 mb-1">Explorer les écoles</h3>
             <p className="text-sm text-gray-600">Rechercher des établissements adaptés</p>
+          </button>
+
+          <button
+            onClick={handleLogout}
+            className="p-4 bg-white rounded-lg shadow-sm border border-red-200 hover:border-red-400 hover:bg-red-50 transition-colors text-left"
+          >
+            <h3 className="font-semibold text-red-600 mb-1 flex items-center gap-2">
+              <LogOut className="w-4 h-4" />
+              Se déconnecter
+            </h3>
+            <p className="text-sm text-red-500">Fermer votre session</p>
           </button>
         </div>
       </div>
