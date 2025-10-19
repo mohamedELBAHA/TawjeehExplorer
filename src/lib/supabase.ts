@@ -9,25 +9,35 @@ console.log('Supabase config:', {
   key: supabaseAnonKey ? 'SET' : 'MISSING' 
 });
 
-// Validate environment variables
-if (!supabaseUrl) {
-  console.error('Missing VITE_SUPABASE_URL environment variable');
-  throw new Error('Missing VITE_SUPABASE_URL environment variable');
-}
+// Create a dummy client if environment variables are missing (for demo/development)
+const createSupabaseClient = () => {
+  if (!supabaseUrl || !supabaseAnonKey) {
+    console.warn('Supabase environment variables missing. Using demo mode.');
+    // Return a mock client for demo purposes
+    return createClient(
+      'https://demo.supabase.co', 
+      'demo-key',
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false,
+          detectSessionInUrl: false
+        }
+      }
+    );
+  }
 
-if (!supabaseAnonKey) {
-  console.error('Missing VITE_SUPABASE_ANON_KEY environment variable');
-  throw new Error('Missing VITE_SUPABASE_ANON_KEY environment variable');
-}
+  return createClient(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      autoRefreshToken: true,
+      persistSession: true,
+      detectSessionInUrl: true
+    }
+  });
+};
 
 // Create and export the Supabase client
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: true
-  }
-});
+export const supabase = createSupabaseClient();
 
 // Export types for TypeScript support
 export type { User, Session, AuthError } from '@supabase/supabase-js';

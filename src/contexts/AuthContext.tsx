@@ -125,6 +125,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
         return;
       }
       
+      // Check if we're in demo mode (missing env vars)
+      const isDemo = !import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY;
+      if (isDemo) {
+        console.log('AuthContext: Running in demo mode');
+        setUser(null);
+        setProfile(null);
+        setLoading(false);
+        setAuthReady(true);
+        clearTimeout(fallbackTimeout);
+        return;
+      }
+      
       try {
         // Add timeout to Supabase call
         const sessionPromise = supabase.auth.getSession();
