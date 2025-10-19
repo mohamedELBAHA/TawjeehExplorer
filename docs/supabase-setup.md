@@ -24,7 +24,7 @@
 2. Update the values in `.env`:
    ```bash
    VITE_SUPABASE_URL=https://your-project-id.supabase.co
-   VITE_SUPABASE_ANON_KEY=your-anon-key-here
+   =your-anon-key-here
    ```
 
 ## 4. Set Up Database Schema

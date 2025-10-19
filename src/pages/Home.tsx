@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import univ1Image from '../images/univ1.jpg';
+import univ2Image from '../images/univ2.jpg';
 import { 
   MapPin, 
   Search, 
@@ -487,16 +489,16 @@ const LandingPage = () => {
             </div>
 
             <div className="relative">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-6">
                 <img
-                  src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=300&h=200&fit=crop"
+                  src={univ1Image}
                   alt="Université"
-                  className="rounded-xl shadow-lg transform rotate-3 hover:rotate-0 transition-transform duration-300"
+                  className="rounded-xl shadow-lg transform rotate-3 hover:rotate-0 transition-transform duration-300 w-full h-[300px] object-cover"
                 />
                 <img
-                  src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=300&h=200&fit=crop"
+                  src={univ2Image}
                   alt="Étudiants"
-                  className="rounded-xl shadow-lg transform -rotate-3 hover:rotate-0 transition-transform duration-300 mt-8"
+                  className="rounded-xl shadow-lg transform -rotate-3 hover:rotate-0 transition-transform duration-300 mt-8 w-full h-[300px] object-cover"
                 />
               </div>
             </div>
@@ -572,11 +574,6 @@ const LandingPage = () => {
                 >
                   <p className="text-white leading-relaxed mb-6">"{testimonial.content}"</p>
                   <div className="flex items-center">
-                    <img
-                      src={testimonial.image}
-                      alt={testimonial.name}
-                      className="w-12 h-12 rounded-full mr-4"
-                    />
                     <div>
                       <div className="font-semibold text-white">{testimonial.name}</div>
                       <div className="text-blue-100 text-sm">{testimonial.role}</div>
@@ -592,11 +589,6 @@ const LandingPage = () => {
                 >
                   <p className="text-white leading-relaxed mb-6">"{testimonial.content}"</p>
                   <div className="flex items-center">
-                    <img
-                      src={testimonial.image}
-                      alt={testimonial.name}
-                      className="w-12 h-12 rounded-full mr-4"
-                    />
                     <div>
                       <div className="font-semibold text-white">{testimonial.name}</div>
                       <div className="text-blue-100 text-sm">{testimonial.role}</div>
@@ -612,11 +604,6 @@ const LandingPage = () => {
                 >
                   <p className="text-white leading-relaxed mb-6">"{testimonial.content}"</p>
                   <div className="flex items-center">
-                    <img
-                      src={testimonial.image}
-                      alt={testimonial.name}
-                      className="w-12 h-12 rounded-full mr-4"
-                    />
                     <div>
                       <div className="font-semibold text-white">{testimonial.name}</div>
                       <div className="text-blue-100 text-sm">{testimonial.role}</div>

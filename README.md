@@ -19,6 +19,7 @@ A comprehensive platform for Moroccan students to discover and compare universit
 - npm or yarn package manager
 - Supabase account (for database)
 
+
 ### Environment Setup
 
 1. **Clone the repository:**

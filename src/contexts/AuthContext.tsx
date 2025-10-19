@@ -10,6 +10,7 @@ interface AuthState {
   loading: boolean;
   authReady: boolean;
   refreshProfile: () => Promise<void>;
+  updateProfile: (profileData: Partial<Profile>) => Promise<boolean>;
   logout: () => Promise<void>;
 }
 
@@ -37,6 +38,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const userProfile = await Promise.race([profilePromise, timeoutPromise]);
       
       console.log('AuthContext: Profile fetched:', !!userProfile);
+      console.log('AuthContext: Profile data:', userProfile);
       setProfile(userProfile);
     } catch (error) {
       console.error('Error fetching profile:', error);
@@ -50,6 +52,26 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setLoading(true);
     try {
       await fetchProfile(user.id);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateProfile = async (profileData: Partial<Profile>): Promise<boolean> => {
+    if (!user?.id) return false;
+    
+    setLoading(true);
+    try {
+      const updatedProfile = await profileService.updateProfile(profileData);
+      if (updatedProfile) {
+        setProfile(updatedProfile);
+        console.log('Profile updated successfully:', updatedProfile);
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      return false;
     } finally {
       setLoading(false);
     }
@@ -242,6 +264,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     loading,
     authReady,
     refreshProfile,
+    updateProfile,
     logout,
   };
 

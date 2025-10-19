@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import type { ClassLevel } from '../types/database';
 import PlatformHeader from '../components/PlatformHeader';
 import { 
   User, 
@@ -14,9 +15,10 @@ import {
 } from 'lucide-react';
 
 export default function Profile() {
-  const { user, profile, logout } = useAuth();
+  const { user, profile, updateProfile, logout } = useAuth();
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [editedProfile, setEditedProfile] = useState({
     first_name: profile?.first_name || '',
     last_name: profile?.last_name || '',
@@ -24,10 +26,40 @@ export default function Profile() {
     class_level: profile?.class_level || ''
   });
 
-  const handleSave = () => {
-    // TODO: Implement profile update logic
-    console.log('Saving profile:', editedProfile);
-    setIsEditing(false);
+  // Update editedProfile when profile changes
+  useEffect(() => {
+    console.log('Profile page: Profile data changed:', profile);
+    setEditedProfile({
+      first_name: profile?.first_name || '',
+      last_name: profile?.last_name || '',
+      city: profile?.city || '',
+      class_level: profile?.class_level || ''
+    });
+  }, [profile]);
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      console.log('Saving profile:', editedProfile);
+      const success = await updateProfile({
+        ...editedProfile,
+        class_level: editedProfile.class_level as ClassLevel || null
+      });
+      
+      if (success) {
+        console.log('Profile updated successfully');
+        setIsEditing(false);
+        // Show success message (you could add a toast notification here)
+      } else {
+        console.error('Failed to update profile');
+        // Show error message (you could add error handling here)
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      // Show error message
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleCancel = () => {
@@ -172,10 +204,24 @@ export default function Profile() {
                   </button>
                   <button
                     onClick={handleSave}
-                    className="px-6 py-2 bg-[#004235] hover:bg-[#004235]/90 text-white rounded-lg transition-colors flex items-center gap-2"
+                    disabled={isSaving}
+                    className={`px-6 py-2 rounded-lg transition-colors flex items-center gap-2 ${
+                      isSaving 
+                        ? 'bg-gray-400 cursor-not-allowed text-white' 
+                        : 'bg-[#004235] hover:bg-[#004235]/90 text-white'
+                    }`}
                   >
-                    <Save className="w-4 h-4" />
-                    Enregistrer
+                    {isSaving ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        Enregistrement...
+                      </>
+                    ) : (
+                      <>
+                        <Save className="w-4 h-4" />
+                        Enregistrer
+                      </>
+                    )}
                   </button>
                 </div>
               </div>
