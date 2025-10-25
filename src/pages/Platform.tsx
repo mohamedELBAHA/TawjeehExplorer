@@ -541,7 +541,6 @@ const Platform: React.FC = () => {
                           <h4 className="font-medium text-gray-900 mb-1 text-sm">Statistiques</h4>
                           <div className="text-xs text-gray-600">
                             <div>Réussite: {school.successRate}%</div>
-                            <div>Emploi: {school.employmentRate}%</div>
                           </div>
                         </div>
                       </div>

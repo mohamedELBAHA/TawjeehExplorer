@@ -250,7 +250,6 @@ ${result.reasons.map(reason => `   ✓ ${reason}`).join('\n')}
    • Étudiants: ${result.school.students}
    • Fondée en: ${result.school.founded}
    • Taux de réussite: ${result.school.successRate}%
-   • Taux d'emploi: ${result.school.employmentRate}%
    • Salaire moyen: ${result.school.averageSalary?.toLocaleString()} MAD
    
    Spécialités: ${result.school.specialties.join(', ')}

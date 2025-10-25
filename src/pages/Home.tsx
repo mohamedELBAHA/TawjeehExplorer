@@ -23,46 +23,6 @@ import {
   Menu,
   X
 } from 'lucide-react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
-
-// Fix for default markers not showing in production
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-});
-
-// Custom Morocco marker icon
-const createMoroccoIcon = () => {
-  return L.divIcon({
-    html: `
-      <div style="
-        background-color: #004235;
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        border: 2px solid #cda86b;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-      ">
-        <div style="
-          color: white;
-          font-size: 10px;
-          font-weight: bold;
-        ">🎓</div>
-      </div>
-    `,
-    className: 'custom-marker',
-    iconSize: [20, 20],
-    iconAnchor: [10, 20],
-    popupAnchor: [0, -20]
-  });
-};
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -328,73 +288,6 @@ const LandingPage = () => {
                   </button>
                 </div>
               </div>
-
-              {/* Right column - Visual */}
-              <div className="relative">
-                <div className="relative bg-white rounded-2xl shadow-2xl p-6 transform rotate-3 hover:rotate-0 transition-transform duration-500">
-                  {/* Mock interface */}
-                  <div className="space-y-4">
-                    {/* Header */}
-                    <div className="flex items-center justify-between">
-                      <h3 className="font-semibold text-gray-800">Carte Interactive</h3>
-                      <div className="flex space-x-2">
-                        <div className="w-3 h-3 bg-red-400 rounded-full"></div>
-                        <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
-                        <div className="w-3 h-3 bg-green-400 rounded-full"></div>
-                      </div>
-                    </div>
-                    
-                    {/* Search bar */}
-                    <div className="relative">
-                      <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
-                      <input 
-                        type="text" 
-                        placeholder="Rechercher une école..."
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg"
-                        readOnly
-                      />
-                    </div>
-
-                    {/* Mock map replaced with real map */}
-                    <div className="h-48 rounded-lg overflow-hidden">
-                      <MapContainer center={[31.7917, -7.0926]} zoom={5} style={{ height: '100%', width: '100%' }}>
-                        <TileLayer
-                          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                        />
-                        <Marker position={[34.0209, -6.8416]} icon={createMoroccoIcon()}>
-                          <Popup>Rabat</Popup>
-                        </Marker>
-                      </MapContainer>
-                    </div>
-
-                    {/* Mock results */}
-                    <div className="space-y-2">
-                      <div className="flex items-center p-3 bg-blue-50 rounded-lg">
-                        <School className="w-5 h-5 text-blue-700 mr-3" />
-                        <div className="flex-1">
-                          <div className="font-medium text-gray-800 text-sm">ENCG Settat</div>
-                          <div className="text-xs text-gray-500">Settat • Commerce et Gestion</div>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-sm font-bold text-blue-600">14.5/20</div>
-                          <div className="text-xs text-gray-400">Seuil</div>
-                        </div>
-                      </div>
-                      <div className="flex items-center p-3 bg-gray-50 rounded-lg">
-                        <School className="w-5 h-5 text-gray-500 mr-3" />
-                        <div className="flex-1">
-                          <div className="font-medium text-gray-600 text-sm">Faculté de Medecine, Université Mohammed V</div>
-                          <div className="text-xs text-gray-400">Casablanca • Médecine</div>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-sm font-bold text-gray-600">16.0/20</div>
-                          <div className="text-xs text-gray-400">Seuil</div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>
@@ -429,7 +322,7 @@ const LandingPage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Pourquoi choisir <span className="bg-gradient-to-r from-[#004235] to-[#cda86b] bg-clip-text text-transparent">Afaqi</span> ?
+              Pourquoi choisir <span className="text-4xl font-bold text-[#004235]">Afaqi</span> ?
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Une plateforme complète qui révolutionne la recherche d'établissements d'enseignement au Maroc

@@ -1,5 +1,5 @@
-import React from 'react';
-import { RotateCcw, Save, Calculator, Target } from 'lucide-react';
+import React, { useRef } from 'react';
+import { RotateCcw, Save, Target } from 'lucide-react';
 
 interface BacNotes {
   regional: number | null;
@@ -10,21 +10,21 @@ interface BacNotes {
 
 interface SimulatorCardProps {
   notes: BacNotes;
-  mode: 'calculate' | 'reverse';
   onNotesChange: (notes: BacNotes) => void;
-  onModeChange: (mode: 'calculate' | 'reverse') => void;
   onReset: () => void;
   onSave: () => void;
+  onSaveButtonClick?: (buttonRect: DOMRect) => void;
 }
 
 const SimulatorCard: React.FC<SimulatorCardProps> = ({
   notes,
-  mode,
   onNotesChange,
-  onModeChange,
   onReset,
-  onSave
+  onSave,
+  onSaveButtonClick
 }) => {
+  const saveButtonRef = useRef<HTMLButtonElement>(null);
+
   const handleInputChange = (field: keyof BacNotes, value: string) => {
     const numValue = value === '' ? null : parseFloat(value);
     if (numValue !== null && (numValue < 0 || numValue > 20)) return;
@@ -35,98 +35,49 @@ const SimulatorCard: React.FC<SimulatorCardProps> = ({
     });
   };
 
+  const handleSaveClick = () => {
+    if (saveButtonRef.current && onSaveButtonClick) {
+      const rect = saveButtonRef.current.getBoundingClientRect();
+      onSaveButtonClick(rect);
+    }
+    onSave();
+  };
+
   const isValidNote = (value: number | null) => {
     return value !== null && value >= 0 && value <= 20;
   };
 
   return (
     <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-      {/* Mode Selector */}
-      <div className="bg-gray-50 px-6 py-4 border-b">
-        <div className="flex space-x-1">
-          <button
-            onClick={() => onModeChange('calculate')}
-            className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all ${
-              mode === 'calculate'
-                ? 'bg-[#004235] text-white shadow-md'
-                : 'bg-white text-gray-600 hover:text-[#004235] shadow-sm'
-            }`}
-          >
-            <Calculator className="w-4 h-4 inline mr-2" />
-            Calculer ma moyenne
-          </button>
-          <button
-            onClick={() => onModeChange('reverse')}
-            className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all ${
-              mode === 'reverse'
-                ? 'bg-[#cda86b] text-white shadow-md'
-                : 'bg-white text-gray-600 hover:text-[#cda86b] shadow-sm'
-            }`}
-          >
-            <Target className="w-4 h-4 inline mr-2" />
-            Objectif à atteindre
-          </button>
-        </div>
-      </div>
-
       <div className="p-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Inputs selon le mode */}
-          {mode === 'calculate' ? (
-            <>
-              <InputField
-                label="Note Examen Régional"
-                value={notes.regional}
-                onChange={(value) => handleInputChange('regional', value)}
-                color="blue"
-                weight="25%"
-                isValid={isValidNote(notes.regional)}
-              />
-              <InputField
-                label="Note Contrôles Continus"
-                value={notes.controleContinue}
-                onChange={(value) => handleInputChange('controleContinue', value)}
-                color="green"
-                weight="25%"
-                isValid={isValidNote(notes.controleContinue)}
-              />
-              <InputField
-                label="Note Examen National"
-                value={notes.national}
-                onChange={(value) => handleInputChange('national', value)}
-                color="purple"
-                weight="50%"
-                isValid={isValidNote(notes.national)}
-              />
-            </>
-          ) : (
-            <>
-              <InputField
-                label="Moyenne souhaitée"
-                value={notes.moyenne}
-                onChange={(value) => handleInputChange('moyenne', value)}
-                color="orange"
-                weight="Objectif"
-                isValid={isValidNote(notes.moyenne)}
-              />
-              <InputField
-                label="Note Examen Régional"
-                value={notes.regional}
-                onChange={(value) => handleInputChange('regional', value)}
-                color="blue"
-                weight="25%"
-                isValid={isValidNote(notes.regional)}
-              />
-              <InputField
-                label="Note Contrôles Continus"
-                value={notes.controleContinue}
-                onChange={(value) => handleInputChange('controleContinue', value)}
-                color="green"
-                weight="25%"
-                isValid={isValidNote(notes.controleContinue)}
-              />
-            </>
-          )}
+        <div className="space-y-6">
+          {/* Mode objectif à atteindre uniquement */}
+          <InputField
+            label="Moyenne souhaitée"
+            value={notes.moyenne}
+            onChange={(value) => handleInputChange('moyenne', value)}
+            color="orange"
+            weight="Objectif"
+            isValid={isValidNote(notes.moyenne)}
+          />
+          <InputField
+            label="Note Examen Régional"
+            value={notes.regional}
+            onChange={(value) => handleInputChange('regional', value)}
+            color="blue"
+            weight="25%"
+            isValid={isValidNote(notes.regional)}
+            optional={true}
+          />
+          <InputField
+            label="Note Contrôles Continus"
+            value={notes.controleContinue}
+            onChange={(value) => handleInputChange('controleContinue', value)}
+            color="green"
+            weight="25%"
+            isValid={isValidNote(notes.controleContinue)}
+            optional={true}
+          />
         </div>
 
         {/* Action Buttons */}
@@ -139,7 +90,8 @@ const SimulatorCard: React.FC<SimulatorCardProps> = ({
             Réinitialiser
           </button>
           <button
-            onClick={onSave}
+            ref={saveButtonRef}
+            onClick={handleSaveClick}
             disabled={notes.moyenne === null}
             className="flex-1 py-3 px-4 bg-[#cda86b] text-white rounded-lg font-medium hover:bg-[#b8956b] disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
           >

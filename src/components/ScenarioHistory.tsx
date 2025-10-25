@@ -19,9 +19,10 @@ interface Scenario {
 interface ScenarioHistoryProps {
   scenarios: Scenario[];
   onLoadScenario: (notes: BacNotes) => void;
+  onDeleteScenario: (id: string) => void;
 }
 
-const ScenarioHistory: React.FC<ScenarioHistoryProps> = ({ scenarios, onLoadScenario }) => {
+const ScenarioHistory: React.FC<ScenarioHistoryProps> = ({ scenarios, onLoadScenario, onDeleteScenario }) => {
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat('fr-FR', {
       day: 'numeric',
@@ -133,10 +134,7 @@ const ScenarioHistory: React.FC<ScenarioHistoryProps> = ({ scenarios, onLoadScen
                   </button>
                   
                   <button
-                    onClick={() => {
-                      // Add delete functionality if needed
-                      console.log('Delete scenario:', scenario.id);
-                    }}
+                    onClick={() => onDeleteScenario(scenario.id)}
                     className="p-2 text-gray-400 hover:text-red-500 transition-colors"
                     title="Supprimer ce scénario"
                   >

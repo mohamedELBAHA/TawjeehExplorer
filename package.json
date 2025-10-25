@@ -9,8 +9,8 @@
     "preview": "vite preview",
     "server": "node server.js",
     "check-db": "node scripts/check-db.js",
-    "test-db": "node scripts/test-profile.js",
-    "setup-db": "node scripts/setup-database.js"
+    "setup-db": "node scripts/setup-database.js",
+    "verify-db": "node scripts/verify-database.js"
   },
   "keywords": [],
   "author": "",
